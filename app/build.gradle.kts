@@ -41,5 +41,4 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.hbb20:ccp:2.6.0")
-    implementation("com.google.android.material:material:1.9.0")
 }
