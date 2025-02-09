@@ -44,10 +44,11 @@
             android:id="@+id/imageView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="110dp"
+            android:layout_marginEnd="100dp"
             app:layout_constraintBottom_toBottomOf="@+id/hope_you_ar"
-            app:layout_constraintStart_toEndOf="@+id/hey_parth"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/hey_parth"
+            app:layout_constraintVertical_bias="0.444"
             app:srcCompat="@drawable/search_icon" />
 
         <ImageView
@@ -169,13 +170,16 @@
 
     </LinearLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+    </FrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

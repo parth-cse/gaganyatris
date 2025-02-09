@@ -13,8 +13,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,42 +52,55 @@ public class MainActivity extends AppCompatActivity {
         blogText = findViewById(R.id.BlogText);
         settingsText = findViewById(R.id.SettingsText);
 
-        setActiveTab(1);
-
         navHome.setOnClickListener(view -> setActiveTab(1));
         navHistory.setOnClickListener(view -> setActiveTab(2));
         navBlog.setOnClickListener(view -> setActiveTab(3));
         navSettings.setOnClickListener(view -> setActiveTab(4));
 
+        // Load the default fragment (HomeFragment)
+        setActiveTab(1);
     }
 
     private void setActiveTab(int tabId) {
-        resetTabs(); // Clear previous active state
+        resetTabs();
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        Fragment fragment = null;
 
         switch (tabId) {
             case 1:
-                homeIcon.setImageResource(R.drawable.home_active); // Use your active icon
+                homeIcon.setImageResource(R.drawable.home_active);
                 homeText.setTextColor(Color.parseColor("#FF4F5A"));
+                fragment = new HomeFragment(); // Replace with your HomeFragment class
                 break;
             case 2:
-                historyIcon.setImageResource(R.drawable.history_active); // Use your active icon
+                historyIcon.setImageResource(R.drawable.history_active);
                 historyText.setTextColor(Color.parseColor("#FF4F5A"));
+                fragment = new HistoryFragment(); // Replace with your HistoryFragment class
                 break;
             case 3:
-                blogIcon.setImageResource(R.drawable.blog_active); // Use your active icon
+                blogIcon.setImageResource(R.drawable.blog_active);
                 blogText.setTextColor(Color.parseColor("#FF4F5A"));
+                fragment = new BlogFragment(); // Replace with your BlogFragment class
                 break;
             case 4:
-                settingsIcon.setImageResource(R.drawable.settings_active); // Use your active icon
+                settingsIcon.setImageResource(R.drawable.settings_active);
                 settingsText.setTextColor(Color.parseColor("#FF4F5A"));
+                fragment = new SettingsFragment(); // Replace with your SettingsFragment class
                 break;
+        }
+
+        if (fragment != null) {
+            ft.replace(R.id.fragment_container, fragment);
+            ft.commit();
         }
     }
 
+
     private void resetTabs() {
-        // Reset all icons and text colors to their default state
-        homeIcon.setImageResource(R.drawable.home);  // Your default icon
-        homeText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color)); // Or your default color resource
+        homeIcon.setImageResource(R.drawable.home);
+        homeText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
 
         historyIcon.setImageResource(R.drawable.history);
         historyText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
