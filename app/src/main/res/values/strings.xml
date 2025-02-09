@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Gaganyatri</string>
+    <string name="gaganyatri">GaganYatri</string>
+    <string name="travel_with">Travel with Purpose.</string>
+    <string name="be_the_comp">Be the Compass in Your Journey, Guide Hope to New Horizons</string>
+    <string name="enter_your_mobile_number">Enter Your Mobile Number</string>
+    <string name="or">OR</string>
+    <string name="enter_otp_to_verify">Enter OTP to Verify</string>
+    <string name="x">X</string>
+    <string name="resend_otp_in_59_sec">Resend OTP in 59 sec</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hey_parth">Hey!👋 Parth</string>
+    <string name="hope_you_ar">Hope you are having a great day</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="blog">Blog</string>
+    <string name="settings">Settings</string>
+</resources>
