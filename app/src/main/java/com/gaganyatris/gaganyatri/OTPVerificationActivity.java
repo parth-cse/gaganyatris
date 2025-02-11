@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -15,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class OTPVerificationActivity extends AppCompatActivity {
     final int statusBarColor = R.color.primaryColor;
-    private ImageView nextBtn;
+    private ImageButton nextBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

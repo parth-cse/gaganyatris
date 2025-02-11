@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
 
+    final int statusBarColor = R.color.primaryColor;
     private LinearLayout navHome, navHistory, navBlog, navSettings;
     private ImageView homeIcon, historyIcon, blogIcon, settingsIcon;
     private TextView homeText, historyText, blogText, settingsText;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
         //NavBar
         navHome = findViewById(R.id.nav_home);
         navHistory = findViewById(R.id.nav_history);
