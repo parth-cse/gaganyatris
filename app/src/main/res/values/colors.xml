@@ -5,4 +5,5 @@
     <color name="primaryColor">#ff4f5a</color>
     <color name="primaryColorBorder">#4DFF4F5A</color>
     <color name="nav_icon_color">#802F4B4C</color>
+    <color name="gray">#802F4B4C</color>
 </resources>

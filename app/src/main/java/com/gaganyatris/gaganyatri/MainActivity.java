@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout navHome, navHistory, navBlog, navSettings;
     private ImageView homeIcon, historyIcon, blogIcon, settingsIcon;
     private TextView homeText, historyText, blogText, settingsText;
+    private int currentTab = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +62,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the default fragment (HomeFragment)
         setActiveTab(1);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+                if (currentTab != 1) { // If not on the Home tab
+                    setActiveTab(1); // Navigate to Home Fragment
+                } else {
+                    finish(); // Exit the app
+                }
+            }
+        });
+
     }
 
     private void setActiveTab(int tabId) {
         resetTabs();
-
+        currentTab = tabId;
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         Fragment fragment = null;

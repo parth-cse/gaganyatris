@@ -30,4 +30,16 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_amp_conditions"><![CDATA[Terms & Conditions]]></string>
     <string name="logout">Logout</string>
+    <string name="my_travel_history">My Travel History</string>
+    <string name="search_by_city_or_date">Search by City or Date</string>
+    <string name="plan_you_first_journey_with_us">Plan you first journey with us.</string>
+    <string name="trip_to_hyderabad">Trip to Hyderabad</string>
+    <string name="feb_19_2025_to_feb_22_2025">Feb 19, 2025 to Feb 22, 2025</string>
+    <string name="solo">Solo</string>
+    <string name="blogs_amp_articles"><![CDATA[Blogs & Articles]]></string>
+    <string name="search_for_articles_blogs_etc">Search for Articles,Blogs, etc</string>
+    <string name="my_hyderabad_trip_sepcial_thanks_to_gaganyatris">My Hyderabad Trip: Sepcial Thanks to GaganYatris.</string>
+    <string name="feb_23_2025">Feb 23, 2025</string>
+    <string name="city_hyderabad">City: HYDERABAD</string>
+    <string name="be_first_to_write_an_article_here">Be First to Write an Article here</string>
 </resources>
