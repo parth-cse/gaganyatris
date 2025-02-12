@@ -79,9 +79,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void setActiveTab(int tabId) {
         resetTabs();
+        int previousTab = currentTab; // Store the previous tab
         currentTab = tabId;
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+
+        int enterAnim;
+        int exitAnim;
+
+        if (tabId > previousTab) {
+            // Sliding in from the right, sliding out to the left
+            enterAnim = R.anim.slide_in_right;  // Create these files
+            exitAnim = R.anim.slide_out_left; // Create these files
+        } else {
+            // Sliding in from the left, sliding out to the right
+            enterAnim = R.anim.slide_in_left;  // Create these files
+            exitAnim = R.anim.slide_out_right; // Create these files
+
+        }
+
+        ft.setCustomAnimations(enterAnim, exitAnim);
+
+
         Fragment fragment = null;
 
         switch (tabId) {
