@@ -2,10 +2,8 @@ package com.gaganyatris.gaganyatri;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,10 +12,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.hbb20.CountryCodePicker;
+
 public class OnBoardingActivity extends AppCompatActivity {
 
     final int statusBarColor = R.color.primaryColor;
-    private ImageButton nextBtn;
+    CountryCodePicker countryCode;
+    EditText phoneNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +32,18 @@ public class OnBoardingActivity extends AppCompatActivity {
         });
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
-        nextBtn = findViewById(R.id.next_btn);
-        nextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent iHome = new Intent(OnBoardingActivity.this, OTPVerificationActivity.class);
-                startActivity(iHome);
+        ImageButton nextBtn = findViewById(R.id.next_btn);
+        countryCode = findViewById(R.id.country_code);
+        phoneNo = findViewById(R.id.phoneNo);
+        countryCode.registerCarrierNumberEditText(phoneNo);
+        nextBtn.setOnClickListener(view -> {
+            if(!countryCode.isValidFullNumber()){
+                phoneNo.setError("Please Enter a Valid Phone Number");
+                return;
             }
+            Intent iHome = new Intent(OnBoardingActivity.this, OTPVerificationActivity.class);
+            iHome.putExtra("phone", countryCode.getFullNumberWithPlus());
+            startActivity(iHome);
         });
     }
 }

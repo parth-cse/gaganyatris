@@ -8,7 +8,6 @@
     <string name="enter_otp_to_verify">Enter OTP to Verify</string>
     <string name="x">X</string>
     <string name="resend_otp_in_59_sec">Resend OTP in 59 sec</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hey_parth">Hey!👋 Parth</string>
     <string name="hope_you_ar">Hope you are having a great day</string>
@@ -21,7 +20,7 @@
     <string name="some_id">+919975108964</string>
     <string name="edit">Edit</string>
     <string name="general">General</string>
-    <string name="add_co_travellers">Add Co Travellers</string>
+    <string name="add_co_travellers">Co Travellers</string>
     <string name="change_language">Change Language</string>
     <string name="app_settings">App Settings</string>
     <string name="ui_mode">UI Mode</string>
@@ -42,4 +41,7 @@
     <string name="feb_23_2025">Feb 23, 2025</string>
     <string name="city_hyderabad">City: HYDERABAD</string>
     <string name="be_first_to_write_an_article_here">Be First to Write an Article here</string>
+    <string name="co_travellers">Co Travellers</string>
+    <string name="ppj8988_gmail_com">ppj8988@gmail.com</string>
+    <string name="help_amp_support"><![CDATA[Help & Support]]></string>
 </resources>

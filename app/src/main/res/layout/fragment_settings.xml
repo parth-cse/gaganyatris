@@ -43,7 +43,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="#eff0f4"
+                android:background="@color/other_bg"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -145,17 +145,19 @@
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/card_settings"
-                    android:paddingHorizontal="22dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/general">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintLayout4"
+                        android:id="@+id/co_traveller_btn"
                         android:layout_width="0dp"
+                        android:focusable="true"
+                        android:paddingHorizontal="22dp"
                         android:layout_height="wrap_content"
                         android:paddingVertical="22dp"
+                        android:clickable="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -184,14 +186,16 @@
                         android:id="@+id/view3"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
+                        android:layout_marginHorizontal="22dp"
                         android:background="#262F4B4C"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+                        app:layout_constraintTop_toBottomOf="@+id/co_traveller_btn" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintLayout5"
                         android:layout_width="0dp"
+                        android:paddingHorizontal="22dp"
                         android:layout_height="wrap_content"
                         android:paddingVertical="22dp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -222,6 +226,7 @@
                         android:id="@+id/view4"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
+                        android:layout_marginHorizontal="22dp"
                         android:background="#262F4B4C"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -230,6 +235,7 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintLayout6"
                         android:layout_width="0dp"
+                        android:paddingHorizontal="22dp"
                         android:layout_height="wrap_content"
                         android:paddingVertical="22dp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -239,7 +245,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/change_language"
+                            android:text="@string/help_amp_support"
                             android:textAppearance="@style/parth_jamkh"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"

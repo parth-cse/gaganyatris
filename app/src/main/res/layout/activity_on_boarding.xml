@@ -106,7 +106,7 @@
         </com.hbb20.CountryCodePicker>
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/phoneNo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -114,6 +114,7 @@
             android:background="@drawable/edit_text_rounded_corner"
             android:hint="@string/enter_your_mobile_number"
             android:padding="15dp"
+            android:inputType="phone"
             android:textColorHint="#3D000000"
             android:textSize="14sp"
              />
@@ -165,6 +166,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView4"
         app:srcCompat="@drawable/continue_with_google" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
