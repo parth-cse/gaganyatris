@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import android.app.ProgressDialog;
+
 
 public class OTPVerificationActivity extends AppCompatActivity {
     final int statusBarColor = R.color.primaryColor;
@@ -85,23 +87,31 @@ public class OTPVerificationActivity extends AppCompatActivity {
     }
 
     void sendOtp(String phone, boolean isResent){
-        startResendTimer();
+        ProgressDialog loadingDialog = new ProgressDialog(this);
+        loadingDialog.setMessage("Sending OTP...");
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+
         PhoneAuthOptions.Builder builder =
                 PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone).setTimeout(timeOutSeconds, TimeUnit.SECONDS)
                         .setActivity(this).setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                             @Override
                             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                loadingDialog.dismiss();
                                 signIn(phoneAuthCredential);
                             }
 
                             @Override
                             public void onVerificationFailed(@NonNull FirebaseException e) {
+                                loadingDialog.dismiss();
                                 Toast.makeText(OTPVerificationActivity.this, "Login Failed", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
                             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                                 super.onCodeSent(s, forceResendingToken);
+                                loadingDialog.dismiss();
+                                startResendTimer();
                                 verificationCode = s;
                                 resendingToken = forceResendingToken;
                                 Toast.makeText(OTPVerificationActivity.this, "OTP has been sent to"+phone, Toast.LENGTH_SHORT).show();
