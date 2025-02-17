@@ -1,12 +1,10 @@
 package com.gaganyatris.gaganyatri;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +26,8 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class OTPVerificationActivity extends AppCompatActivity {
@@ -80,9 +80,12 @@ public class OTPVerificationActivity extends AppCompatActivity {
             PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationCode, enteredOTP);
             signIn(credential);
         });
+
+        resend.setOnClickListener(view -> sendOtp(phoneNo, true));
     }
 
     void sendOtp(String phone, boolean isResent){
+        startResendTimer();
         PhoneAuthOptions.Builder builder =
                 PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone).setTimeout(timeOutSeconds, TimeUnit.SECONDS)
                         .setActivity(this).setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -126,5 +129,27 @@ public class OTPVerificationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    void startResendTimer() {
+        resend.setTextColor(Color.parseColor("#66000000"));
+        resend.setEnabled(false);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(() -> {
+                    timeOutSeconds--;
+                    resend.setText("Resend OTP in " + timeOutSeconds);
+                    if (timeOutSeconds <= 0) {
+                        timeOutSeconds = 60L;
+                        timer.cancel();
+                        resend.setText("Resend OTP");
+                        resend.setTextColor(Color.parseColor("#4285F4"));
+                        resend.setEnabled(true);
+                    }
+                });
+            }
+        }, 0, 1000);
     }
 }
