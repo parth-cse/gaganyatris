@@ -10,6 +10,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SplashActivity extends AppCompatActivity {
 
     Handler handler = new Handler();
@@ -26,19 +29,20 @@ public class SplashActivity extends AppCompatActivity {
             return insets;
         });
 
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                Intent iHome = new Intent(SplashActivity.this, OnBoardingActivity.class);
-                startActivity(iHome);
-                finish();
+        runnable = () -> {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                // User is already signed in
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            } else {
+                // User not signed in, go to onboarding
+                startActivity(new Intent(SplashActivity.this, OnBoardingActivity.class));
             }
+            finish();
         };
 
-        handler.postDelayed(
-                runnable
-                , 4000);
-
+        // Run the check after a 4-second delay
+        handler.postDelayed(runnable, 4000);
     }
 
     @Override

@@ -19,6 +19,7 @@ public class OnBoardingActivity extends AppCompatActivity {
     final int statusBarColor = R.color.primaryColor;
     CountryCodePicker countryCode;
     EditText phoneNo;
+    ImageButton googleAuthBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class OnBoardingActivity extends AppCompatActivity {
         countryCode = findViewById(R.id.country_code);
         phoneNo = findViewById(R.id.phoneNo);
         countryCode.registerCarrierNumberEditText(phoneNo);
+        googleAuthBtn = findViewById(R.id.google_signin);
         nextBtn.setOnClickListener(view -> {
             if(!countryCode.isValidFullNumber()){
                 phoneNo.setError("Please Enter a Valid Phone Number");
