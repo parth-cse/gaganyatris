@@ -44,4 +44,17 @@
     <string name="co_travellers">Co Travellers</string>
     <string name="ppj8988_gmail_com">ppj8988@gmail.com</string>
     <string name="help_amp_support"><![CDATA[Help & Support]]></string>
+    <string name="upcoming_trips">Upcoming Trips</string>
+    <string name="plan_your_trip">Plan your trip</string>
+    <string name="select_a_language">Select a Language</string>
+    <string name="english">English</string>
+    <string name="hindi">हिन्दी</string>
+    <string name="marathi">मराठी</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="change_ui_mode">Change UI Mode</string>
+    <string name="select_a_ui_mode">Select a UI Mode</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="reminders">Reminders</string>
+    <string name="remind_me_in_every">Remind me in Every</string>
 </resources>

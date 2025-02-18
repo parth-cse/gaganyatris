@@ -8,4 +8,6 @@
     <color name="gray">#802F4B4C</color>
     <color name="other_bg">#EFF0F4</color>
     <color name="newStatusBar">#08347C</color>
+    <color name="holo_green_dark">#34A853</color>
+    <color name="holo_green_light">#CC34A853</color>
 </resources>

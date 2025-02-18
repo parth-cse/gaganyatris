@@ -28,6 +28,18 @@
         android:theme="@style/Theme.Gaganyatri"
         tools:targetApi="31">
         <activity
+            android:name=".HelpSupportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TravelSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UiModeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeLanguageActivity"
+            android:exported="false" />
+        <activity
             android:name=".CoTravellerActivity"
             android:exported="false" />
         <activity

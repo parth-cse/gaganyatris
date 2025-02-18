@@ -102,4 +102,8 @@
         <item name="android:textSize">10sp</item>
         <item name="android:textColor">#802F4B4C</item>
     </style>
+    <style name="drop">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#33535F</item>
+    </style>
 </resources>

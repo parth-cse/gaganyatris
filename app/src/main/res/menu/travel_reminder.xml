@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/weekly_option"
+        android:title="Weekly" />
+    <item
+        android:id="@+id/monthly_option"
+        android:title="Monthly" />
+    <item
+        android:id="@+id/quaterly_option"
+        android:title="Quaterly" />
+    <item
+        android:id="@+id/bi_yearly_option"
+        android:title="6 Months" />
+    <item
+        android:id="@+id/yearly_option"
+        android:title="Yearly" />
+</menu>
