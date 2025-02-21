@@ -57,4 +57,7 @@
     <string name="dark">Dark</string>
     <string name="reminders">Reminders</string>
     <string name="remind_me_in_every">Remind me in Every</string>
+    <string name="awb_pf1"><b>AWB</b> PF1</string>
+    <string name="lpi_pf1"><b>LPI</b> PF5</string>
+    <string name="explore_your_location">EXPLORE YOUR\nLOCATION</string>
 </resources>

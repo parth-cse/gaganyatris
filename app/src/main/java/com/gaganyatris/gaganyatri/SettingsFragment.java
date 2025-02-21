@@ -26,6 +26,7 @@ public class SettingsFragment extends Fragment {
 
         // Use a more concise way to get views and set click listeners
         // Also, use Kotlin's apply scope function for cleaner code.
+        view.findViewById(R.id.button).setOnClickListener(v -> startActivity(new Intent(requireContext(), UserDetailActivity.class)));
         view.findViewById(R.id.co_traveller_btn).setOnClickListener(v -> startActivity(new Intent(requireContext(), CoTravellerActivity.class)));
         view.findViewById(R.id.logout).setOnClickListener(v -> showLogoutLoader());
         view.findViewById(R.id.change_language).setOnClickListener(v -> startActivity(new Intent(requireContext(), ChangeLanguageActivity.class)));

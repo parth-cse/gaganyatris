@@ -97,5 +97,19 @@
             app:layout_constraintTop_toBottomOf="@+id/imageView15"
             app:layout_constraintVertical_bias="0.06999999" />
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+            <include layout="@layout/blog_card" />
+
+            <include layout="@layout/blog_card" />
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

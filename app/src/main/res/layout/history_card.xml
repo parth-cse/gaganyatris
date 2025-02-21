@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:layout_marginTop="12dp">
+    android:layout_marginTop="12dp"
+    android:id="@+id/history_card_layout"
+    android:elevation="1dp">
 
     <ImageView
         android:id="@+id/imageView14"
