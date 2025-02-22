@@ -23,8 +23,12 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         LinearLayout findTickets = view.findViewById(R.id.find_tickets);
+        LinearLayout travelGroups = view.findViewById(R.id.travel_groups);
+        LinearLayout getGuide = view.findViewById(R.id.get_guide);
 
         findTickets.setOnClickListener(v -> startActivity(new Intent(requireContext(), ModeOfTransportActivity.class)));
+        travelGroups.setOnClickListener(v -> startActivity(new Intent(requireContext(), TravelGroupActivity.class)));
+        getGuide.setOnClickListener(v -> startActivity(new Intent(requireContext(), GetGuideActivity.class)));
 
         return view;
     }

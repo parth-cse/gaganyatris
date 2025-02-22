@@ -1,7 +1,9 @@
 package com.gaganyatris.gaganyatri;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,5 +30,13 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         ImageButton backBtn = findViewById(R.id.backBtn);
         backBtn.setOnClickListener(v -> finish());
+
+        LinearLayout tripPlan = findViewById(R.id.tripPlan);
+        LinearLayout checkList = findViewById(R.id.checkList);
+        LinearLayout mapView = findViewById(R.id.mapView);
+
+        tripPlan.setOnClickListener(v -> startActivity(new Intent(TripDetailsActivity.this, TripPlanActivity.class)));
+        checkList.setOnClickListener(v -> startActivity(new Intent(TripDetailsActivity.this, TripCheckListActivity.class)));
+        mapView.setOnClickListener(v -> startActivity(new Intent(TripDetailsActivity.this, TripMapViewActivity.class)));
     }
 }

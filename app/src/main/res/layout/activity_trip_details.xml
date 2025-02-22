@@ -763,6 +763,7 @@
                 android:layout_marginBottom="30dp">
 
                 <LinearLayout
+                    android:id="@+id/tripPlan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -786,6 +787,7 @@
                     android:layout_height="match_parent"
                     android:background="#262F4B4C"/>
                 <LinearLayout
+                    android:id="@+id/checkList"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -809,6 +811,7 @@
                     android:layout_height="match_parent"
                     android:background="#262F4B4C"/>
                 <LinearLayout
+                    android:id="@+id/mapView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
