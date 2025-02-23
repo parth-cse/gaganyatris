@@ -1,19 +1,34 @@
 package com.gaganyatris.gaganyatri;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.activity.OnBackPressedCallback;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.gaganyatris.gaganyatri.models.Users;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class SelectAvatarFragment extends Fragment {
+
+    private CardView selectedCardView = null;
+    private int selectedAvatarIndex = -1;
+    private CardView[] cardViews;
+    private ProgressDialog progressDialog;
 
     public SelectAvatarFragment() {
         // Required empty public constructor
@@ -28,12 +43,115 @@ public class SelectAvatarFragment extends Fragment {
 
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
-                // Use FragmentManager to pop the back stack
                 FragmentManager fm = requireActivity().getSupportFragmentManager();
-                fm.popBackStack(); // or fm.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE) if you want to pop up to the given tag inclusive
+                fm.popBackStack();
             });
         }
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        cardViews = new CardView[]{
+                view.findViewById(R.id.cardView1), view.findViewById(R.id.cardView2), view.findViewById(R.id.cardView3),
+                view.findViewById(R.id.cardView11), view.findViewById(R.id.cardView12), view.findViewById(R.id.cardView13),
+                view.findViewById(R.id.cardView21), view.findViewById(R.id.cardView22), view.findViewById(R.id.cardView23)
+        };
+
+        // Set the first card as the default selected one
+        selectAvatar(cardViews[0], 0);
+
+        for (int i = 0; i < cardViews.length; i++) {
+            final int index = i;
+            cardViews[i].setOnClickListener(v -> {
+                selectAvatar(cardViews[index], index);
+            });
+        }
+
+        Button btnSave = view.findViewById(R.id.btn_save);
+        btnSave.setOnClickListener(v -> {
+            if (selectedAvatarIndex != -1) {
+                // Get data from arguments
+                Bundle args = getArguments();
+                if (args != null) {
+                    String name = args.getString("name");
+                    String email = args.getString("email");
+                    String phone = args.getString("phone");
+                    String dob = args.getString("dob");
+                    String gender = args.getString("gender");
+                    String country = args.getString("country");
+                    String state = args.getString("state");
+                    String city = args.getString("city");
+
+                    // Get current Firebase User
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        String uid = user.getUid();
+
+                        // Create a Users object
+                        Users userData = new Users(uid, name, email, phone, dob, gender, country, state, city, selectedAvatarIndex);
+
+                        // Save to Firestore
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                        progressDialog = new ProgressDialog(requireContext());
+                        progressDialog.setMessage("Saving data...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+
+                        db.collection("users").document(uid).set(userData)
+                                .addOnSuccessListener(documentReference -> {
+                                    if (progressDialog != null && progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+                                    Toast.makeText(getContext(), "User data saved", Toast.LENGTH_SHORT).show();
+
+                                    // Navigate back based on the calling activity
+                                    if (getActivity() instanceof OTPVerificationActivity) {
+                                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear the back stack
+                                        startActivity(intent);
+                                    } else {
+                                        // If called from another activity, simply finish the current activity
+                                        if (getActivity() != null) {
+                                            getActivity().finish();
+                                        }
+                                    }
+
+                                })
+                                .addOnFailureListener(e -> {
+                                    if (progressDialog != null && progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+                                    Toast.makeText(getContext(), "Error saving user data", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            } else {
+                Toast.makeText(getContext(), "Please select an avatar", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void selectAvatar(CardView cardView, int index) {
+        if (selectedCardView != null) {
+            selectedCardView.setCardBackgroundColor(Color.WHITE);
+        }
+        cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.holo_green_dark));
+        selectedCardView = cardView;
+        selectedAvatarIndex = index;
+
+        //Change all other cardview color to white.
+        for (CardView otherCard : cardViews) {
+            if (otherCard != cardView) {
+                otherCard.setCardBackgroundColor(Color.WHITE);
+            }
+        }
     }
 }

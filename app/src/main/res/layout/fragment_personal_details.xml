@@ -58,6 +58,7 @@
                     android:textAppearance="@style/train_fligh" />
 
                 <EditText
+                    android:id="@+id/first_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/card_settings"
@@ -84,11 +85,12 @@
                     android:textAppearance="@style/train_fligh" />
 
                 <EditText
+                    android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/card_settings"
                     android:hint="Eg. abc@example.com"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="16dp"
                     android:textColor="@color/black"
@@ -109,17 +111,42 @@
                     android:text="Mobile*"
                     android:textAppearance="@style/train_fligh" />
 
-                <EditText
+                <LinearLayout
+                    android:id="@+id/mobile_number_form"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/card_settings"
-                    android:hint="Eg. +91 XXXXX-XXXXX"
-                    android:inputType="text"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="16dp"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/gray"
-                    android:textSize="14sp" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/be_the_comp"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <com.hbb20.CountryCodePicker
+                        app:ccp_defaultNameCode="IND"
+                        android:id="@+id/countryCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:ccp_textSize="14sp"
+                        app:ccp_autoDetectCountry="true"
+                        app:ccp_showFlag="false"
+                        app:ccp_showNameCode="false"
+                        app:ccp_showPhoneCode="true"
+                        app:ccp_showFullName="false">
+                    </com.hbb20.CountryCodePicker>
+
+                    <EditText
+                        android:id="@+id/phone_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/card_settings"
+                        android:hint="Eg. XXXXX-XXXXX"
+                        android:padding="15dp"
+                        android:inputType="phone"
+                        android:textColorHint="#3D000000"
+                        android:textSize="14sp"
+                        />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -138,15 +165,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Age*"
+                        android:text="Date of Birth"
                         android:textAppearance="@style/train_fligh" />
 
                     <EditText
+                        android:id="@+id/et_dob"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_settings"
-                        android:hint="Eg. +91 XXXXX-XXXXX"
-                        android:inputType="text"
+                        android:hint="DD/MM/YYYY"
+                        android:focusable="false"
+                        android:clickable="true"
                         android:paddingHorizontal="24dp"
                         android:paddingVertical="16dp"
                         android:textColor="@color/black"
@@ -175,6 +204,9 @@
                         android:background="@drawable/card_settings"
                         android:hint="Select Gender"
                         android:inputType="none"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
                         android:paddingHorizontal="24dp"
                         android:paddingVertical="16dp"
                         android:textColor="@color/black"
@@ -203,6 +235,7 @@
                         android:textAppearance="@style/train_fligh" />
 
                     <EditText
+                        android:id="@+id/country"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_settings"
@@ -230,6 +263,7 @@
                         android:textAppearance="@style/train_fligh" />
 
                     <EditText
+                        android:id="@+id/state"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_settings"
@@ -261,14 +295,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="City*"
+                        android:text="City"
                         android:textAppearance="@style/train_fligh" />
 
                     <EditText
+                        android:id = "@+id/city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_settings"
-                        android:hint="Eg. INDIA"
+                        android:hint="Eg. MUMBAI"
                         android:inputType="text"
                         android:paddingHorizontal="24dp"
                         android:paddingVertical="16dp"

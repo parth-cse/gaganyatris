@@ -108,21 +108,25 @@ public class MainActivity extends AppCompatActivity {
                 homeIcon.setImageResource(R.drawable.home_active);
                 homeText.setTextColor(Color.parseColor("#FF4F5A"));
                 fragment = new HomeFragment(); // Replace with your HomeFragment class
+                navHome.setEnabled(false);
                 break;
             case 2:
                 historyIcon.setImageResource(R.drawable.history_active);
                 historyText.setTextColor(Color.parseColor("#FF4F5A"));
                 fragment = new HistoryFragment(); // Replace with your HistoryFragment class
+                navHistory.setEnabled(false);
                 break;
             case 3:
                 blogIcon.setImageResource(R.drawable.blog_active);
                 blogText.setTextColor(Color.parseColor("#FF4F5A"));
                 fragment = new BlogFragment(); // Replace with your BlogFragment class
+                navBlog.setEnabled(false);
                 break;
             case 4:
                 settingsIcon.setImageResource(R.drawable.settings_active);
                 settingsText.setTextColor(Color.parseColor("#FF4F5A"));
                 fragment = new SettingsFragment(); // Replace with your SettingsFragment class
+                navSettings.setEnabled(false);
                 break;
         }
 
@@ -136,14 +140,18 @@ public class MainActivity extends AppCompatActivity {
     private void resetTabs() {
         homeIcon.setImageResource(R.drawable.home);
         homeText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
+        navHome.setEnabled(true);
 
         historyIcon.setImageResource(R.drawable.history);
         historyText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
+        navHistory.setEnabled(true);
 
         blogIcon.setImageResource(R.drawable.blog);
         blogText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
+        navBlog.setEnabled(true);
 
         settingsIcon.setImageResource(R.drawable.settings);
         settingsText.setTextColor(ContextCompat.getColor(this, R.color.nav_icon_color));
+        navSettings.setEnabled(true);
     }
 }

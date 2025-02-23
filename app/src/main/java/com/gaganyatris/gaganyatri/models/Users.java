@@ -1,6 +1,7 @@
 package com.gaganyatris.gaganyatri.models;
 
 public class Users {
+    private String uid; // Add UID
     private String name;
     private String email;
     private String phone;
@@ -9,8 +10,14 @@ public class Users {
     private String country;
     private String state;
     private String city;
+    private int avatarIndex;
 
-    public Users(String name, String email, String phone, String dob, String gender, String country, String state, String city) {
+    public Users() {
+        // Required empty constructor for Firestore
+    }
+
+    public Users(String uid, String name, String email, String phone, String dob, String gender, String country, String state, String city, int avatarIndex) {
+        this.uid = uid;
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -19,6 +26,13 @@ public class Users {
         this.country = country;
         this.state = state;
         this.city = city;
+        this.avatarIndex = avatarIndex;
+    }
+
+    // Getters and setters...
+
+    public String getUid() {
+        return uid;
     }
 
     public String getName() {
@@ -45,12 +59,12 @@ public class Users {
         this.phone = phone;
     }
 
-    public String getDOB() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDOB(String dob) {
-        this.dateOfBirth = dob;
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getGender() {
@@ -84,4 +98,18 @@ public class Users {
     public void setCity(String city) {
         this.city = city;
     }
+
+    public int getAvatarIndex() {
+        return avatarIndex;
+    }
+
+    public void setAvatarIndex(int avatarIndex) {
+        this.avatarIndex = avatarIndex;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    // ... other getters and setters
 }

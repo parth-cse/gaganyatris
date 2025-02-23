@@ -84,6 +84,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Switch
+
                 android:id="@+id/travelreminders"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -148,10 +149,4 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
