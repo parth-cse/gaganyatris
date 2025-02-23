@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/hey_parth"
+                android:id="@+id/hey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
@@ -40,8 +40,8 @@
                 android:gravity="top"
                 android:text="@string/hope_you_ar"
                 android:textAppearance="@style/hope_you_ar"
-                app:layout_constraintStart_toStartOf="@+id/hey_parth"
-                app:layout_constraintTop_toBottomOf="@+id/hey_parth" />
+                app:layout_constraintStart_toStartOf="@+id/hey"
+                app:layout_constraintTop_toBottomOf="@+id/hey" />
 
             <ImageView
                 android:id="@+id/imageView6"
@@ -50,7 +50,7 @@
                 android:layout_marginEnd="100dp"
                 app:layout_constraintBottom_toBottomOf="@+id/hope_you_ar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/hey_parth"
+                app:layout_constraintTop_toTopOf="@+id/hey"
                 app:layout_constraintVertical_bias="0.444"
                 app:srcCompat="@drawable/search_icon" />
 

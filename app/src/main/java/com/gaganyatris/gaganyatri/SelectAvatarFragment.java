@@ -19,16 +19,23 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.gaganyatris.gaganyatri.models.Users;
+import com.gaganyatris.gaganyatri.utils.LoadingDialog;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SelectAvatarFragment extends Fragment {
 
     private CardView selectedCardView = null;
     private int selectedAvatarIndex = -1;
     private CardView[] cardViews;
-    private ProgressDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     public SelectAvatarFragment() {
         // Required empty public constructor
@@ -81,6 +88,17 @@ public class SelectAvatarFragment extends Fragment {
                     String email = args.getString("email");
                     String phone = args.getString("phone");
                     String dob = args.getString("dob");
+                    Timestamp dobTimestamp = null;
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                        Date date = sdf.parse(dob);
+                        if (date != null) {
+                            dobTimestamp = new Timestamp(date);
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     String gender = args.getString("gender");
                     String country = args.getString("country");
                     String state = args.getString("state");
@@ -92,22 +110,20 @@ public class SelectAvatarFragment extends Fragment {
                         String uid = user.getUid();
 
                         // Create a Users object
-                        Users userData = new Users(uid, name, email, phone, dob, gender, country, state, city, selectedAvatarIndex);
+                        Users userData = new Users(uid, name, email, phone, dobTimestamp, gender, country, state, city, selectedAvatarIndex);
 
                         // Save to Firestore
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                        progressDialog = new ProgressDialog(requireContext());
-                        progressDialog.setMessage("Saving data...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
+                        loadingDialog = new LoadingDialog(requireContext());
+                        loadingDialog.setMessage("Saving Data...");
+                        loadingDialog.show();
 
                         db.collection("users").document(uid).set(userData)
                                 .addOnSuccessListener(documentReference -> {
-                                    if (progressDialog != null && progressDialog.isShowing()) {
-                                        progressDialog.dismiss();
+                                    if (loadingDialog != null && loadingDialog.isShowing()) {
+                                        loadingDialog.dismiss();
                                     }
-                                    Toast.makeText(getContext(), "User data saved", Toast.LENGTH_SHORT).show();
 
                                     // Navigate back based on the calling activity
                                     if (getActivity() instanceof OTPVerificationActivity) {
@@ -123,8 +139,8 @@ public class SelectAvatarFragment extends Fragment {
 
                                 })
                                 .addOnFailureListener(e -> {
-                                    if (progressDialog != null && progressDialog.isShowing()) {
-                                        progressDialog.dismiss();
+                                    if (loadingDialog != null && loadingDialog.isShowing()) {
+                                        loadingDialog.dismiss();
                                     }
                                     Toast.makeText(getContext(), "Error saving user data", Toast.LENGTH_SHORT).show();
                                 });

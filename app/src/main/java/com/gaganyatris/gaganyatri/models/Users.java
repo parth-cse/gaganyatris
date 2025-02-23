@@ -1,11 +1,13 @@
 package com.gaganyatris.gaganyatri.models;
 
+import com.google.firebase.Timestamp;
+
 public class Users {
     private String uid; // Add UID
     private String name;
     private String email;
     private String phone;
-    private String dateOfBirth;
+    private Timestamp dateOfBirth;
     private String gender;
     private String country;
     private String state;
@@ -16,7 +18,7 @@ public class Users {
         // Required empty constructor for Firestore
     }
 
-    public Users(String uid, String name, String email, String phone, String dob, String gender, String country, String state, String city, int avatarIndex) {
+    public Users(String uid, String name, String email, String phone, Timestamp dob, String gender, String country, String state, String city, int avatarIndex) {
         this.uid = uid;
         this.name = name;
         this.email = email;
@@ -59,11 +61,11 @@ public class Users {
         this.phone = phone;
     }
 
-    public String getDateOfBirth() {
+    public Timestamp getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Timestamp dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

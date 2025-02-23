@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.gaganyatris.gaganyatri.utils.LoadingDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -103,10 +104,9 @@ public class PersonalDetailsFragment extends Fragment {
         gender.setKeyListener(null);
 
         // Show ProgressDialog while fetching data
-        ProgressDialog progressDialog = new ProgressDialog(requireContext());
-        progressDialog.setMessage("Please wait...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        LoadingDialog loadingDialog = new LoadingDialog(requireContext());
+        loadingDialog.setMessage("Please Wait...");
+        loadingDialog.show();
 
         // Fetch user details from Firestore
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -116,7 +116,7 @@ public class PersonalDetailsFragment extends Fragment {
 
             db.collection("users").document(uid).get()
                     .addOnSuccessListener(documentSnapshot -> {
-                        progressDialog.dismiss(); // Dismiss progress dialog
+                        loadingDialog.dismiss(); // Dismiss progress dialog
 
                         if (documentSnapshot.exists()) {
                             // Retrieve data from Firestore
@@ -145,11 +145,11 @@ public class PersonalDetailsFragment extends Fragment {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        progressDialog.dismiss(); // Dismiss progress dialog
+                        loadingDialog.dismiss(); // Dismiss progress dialog
                         Toast.makeText(requireContext(), "Failed to load data", Toast.LENGTH_SHORT).show();
                     });
         } else {
-            progressDialog.dismiss(); // Dismiss if no user is logged in
+            loadingDialog.dismiss(); // Dismiss if no user is logged in
         }
 
         // Handle button click to navigate to the next fragment
@@ -241,7 +241,7 @@ public class PersonalDetailsFragment extends Fragment {
                 }, year, month, day);
 
         // Optional: Set a maximum date (e.g., user must be at least 18 years old)
-        calendar.set(Calendar.YEAR, year - 18);
+        calendar.set(Calendar.YEAR, year - 16);
         datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
 
         datePickerDialog.show();
