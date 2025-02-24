@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,13 +45,19 @@ public class CoTravellerActivity extends AppCompatActivity {
             return insets;
         });
 
-        findViewById(R.id.add_co_traveller).setOnClickListener(v -> {startActivity(new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class)); finish();});
-
+        findViewById(R.id.add_co_traveller).setOnClickListener(v -> startActivity(new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class)));
+        findViewById(R.id.backBtn).setOnClickListener(v -> finish());
         coTravellerContainer = findViewById(R.id.coTravellerContainer);
         db = FirebaseFirestore.getInstance();
 
         setupLoadingDialog(); // Initialize the loading dialog
         loadBaseUserDetails();
+        loadCoTravellers();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadCoTravellers();
     }
 
@@ -95,6 +103,7 @@ public class CoTravellerActivity extends AppCompatActivity {
         TextView nameTextView = coTravellerView.findViewById(R.id.textView4);
         TextView emailTextView = coTravellerView.findViewById(R.id.some_id);
         CardView avatarCard = coTravellerView.findViewById(R.id.cardView);
+        ImageButton optionsButton = coTravellerView.findViewById(R.id.optionsLayout);
 
         nameTextView.setText(coTraveller.getName());
         emailTextView.setText(coTraveller.getEmail());
@@ -104,8 +113,48 @@ public class CoTravellerActivity extends AppCompatActivity {
             avatarCard.setForeground(ContextCompat.getDrawable(this, avatarResource));
         }
 
+        // Set up popup menu for Edit/Delete
+        optionsButton.setOnClickListener(v -> showPopupMenu(v, coTraveller));
+
         coTravellerContainer.addView(coTravellerView);
     }
+
+    private void showPopupMenu(View view, CoTraveller coTraveller) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.inflate(R.menu.co_traveller_menu); // Ensure this menu XML exists
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId(); // Extract item ID first
+
+            if (itemId == R.id.menu_edit) {
+                // editCoTraveller(coTraveller);
+                Intent intent = new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class);
+                intent.putExtra("coTraveller_id", coTraveller.getCoTraveller_id()); // Pass coTraveller_id
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.menu_delete) {
+                deleteCoTraveller(coTraveller.getCoTraveller_id(), view);
+                loadCoTravellers();
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        popupMenu.show();
+    }
+
+    private void deleteCoTraveller(String coTravellerId, View coTravellerView) {
+        db.collection("coTravellers").document(coTravellerId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    coTravellerContainer.removeView(coTravellerView);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     private int getAvatarDrawable(int avatarIndex) {
         switch (avatarIndex) {

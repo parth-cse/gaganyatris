@@ -2,6 +2,7 @@ package com.gaganyatris.gaganyatri;
 
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,12 +32,24 @@ public class AddCoTravellerActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
 
         // Load PersonalDetailsFragment initially
-        if (savedInstanceState == null) {
-            loadFragment(new CoTravellerDetailsFragment(), false);
-        }
+
 
         ImageButton back = findViewById(R.id.backBtn);
         back.setOnClickListener(v -> finish());
+
+        CoTravellerDetailsFragment fragment = new CoTravellerDetailsFragment();
+        String coTravellerId = getIntent().getStringExtra("coTraveller_id");
+        if(coTravellerId != null){
+//            TextView header = findViewById(R.id.textView2);
+//            header.setText("Edit Co Traveller");
+            Bundle bundle = new Bundle();
+            bundle.putString("coTraveller_id", coTravellerId);
+            fragment.setArguments(bundle);
+        }
+
+        if (savedInstanceState == null) {
+            loadFragment(fragment, false);
+        }
     }
 
     public void loadFragment(Fragment fragment, boolean addToBackStack) {

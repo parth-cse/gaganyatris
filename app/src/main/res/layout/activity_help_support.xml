@@ -40,82 +40,6 @@
         app:layout_constraintTop_toTopOf="@+id/textView2"
         app:srcCompat="@drawable/back_arrow" />
 
-    <Button
-        android:id="@+id/contactUsBTN"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginHorizontal="16dp"
-        android:text="Contact Us"
-        android:paddingVertical="15dp"
-        android:textStyle="normal"
-        android:textSize="16sp"
-        android:layout_marginBottom="20dp"/>
-
-    <View
-        android:id="@+id/bg"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#99000000"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <LinearLayout
-        android:id="@+id/optionsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/bottom_drawer"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="30dp"
-        android:visibility="gone"  app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_settings">
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/sendEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-                <ImageView
-                    android:id="@+id/emailIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_email"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Write via Email"
-                    android:layout_marginStart="16dp"
-                    android:textAppearance="@style/parth_jamkh"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/emailIcon"/>
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/chevron_right"
-                    android:background="@android:color/transparent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </LinearLayout>
-
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -371,6 +295,86 @@
 
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/contactUsBTN"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginHorizontal="16dp"
+        android:text="Contact Us"
+        android:paddingVertical="15dp"
+        android:textStyle="normal"
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp"/>
+
+    <View
+        android:id="@+id/bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#99000000"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/optionsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_drawer"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="30dp"
+        android:visibility="gone"  app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_settings">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/sendEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/emailIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_email"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Write via Email"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/parth_jamkh"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/emailIcon"/>
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/chevron_right"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+
+
+
 
 
 

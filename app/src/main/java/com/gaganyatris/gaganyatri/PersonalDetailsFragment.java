@@ -227,9 +227,11 @@ public class PersonalDetailsFragment extends Fragment {
     }
 
     private void showDatePickerDialog() {
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        // Use a fresh instance of Calendar to get the current date
+        Calendar currentCalendar = Calendar.getInstance();
+        int year = currentCalendar.get(Calendar.YEAR);
+        int month = currentCalendar.get(Calendar.MONTH);
+        int day = currentCalendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
                 (view, selectedYear, selectedMonth, selectedDay) -> {
@@ -239,9 +241,10 @@ public class PersonalDetailsFragment extends Fragment {
                     dob.setText(formattedDate);
                 }, year, month, day);
 
-        // Optional: Set a maximum date (e.g., user must be at least 18 years old)
-        calendar.set(Calendar.YEAR, year - 16);
-        datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+        // Set max date (current date - 16 years)
+        Calendar maxDateCalendar = Calendar.getInstance();
+        maxDateCalendar.set(Calendar.YEAR, year - 16);
+        datePickerDialog.getDatePicker().setMaxDate(maxDateCalendar.getTimeInMillis());
 
         datePickerDialog.show();
     }

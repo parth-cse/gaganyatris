@@ -1,6 +1,5 @@
 package com.gaganyatris.gaganyatri;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.gaganyatris.gaganyatri.models.CoTraveller;
 import com.gaganyatris.gaganyatri.utils.LoadingDialog;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class CoTravellerAvatarFragment extends Fragment {
@@ -27,15 +27,16 @@ public class CoTravellerAvatarFragment extends Fragment {
     private int selectedAvatarIndex = -1;
     private CardView[] cardViews;
     private LoadingDialog loadingDialog;
-    private CoTraveller coTraveller; // Store co-traveller object
+    private CoTraveller coTraveller;
+    private Button btnSave;
+    private boolean isUpdating = false; // Track if editing existing co-traveller
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_avatar, container, false);
 
         LinearLayout btnBack = view.findViewById(R.id.btn_back);
-        Button btnSave = view.findViewById(R.id.btn_save);
+        btnSave = view.findViewById(R.id.btn_save);
 
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
@@ -48,6 +49,15 @@ public class CoTravellerAvatarFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             coTraveller = args.getParcelable("coTraveller");
+            boolean isEditing = args.getBoolean("isEditing", false);
+
+            // **Update button text immediately**
+            if (isEditing) {
+                btnSave.setText("Update");
+            } else {
+                btnSave.setText("Save");
+            }
+
         }
 
         cardViews = new CardView[]{
@@ -64,12 +74,21 @@ public class CoTravellerAvatarFragment extends Fragment {
             cardViews[i].setOnClickListener(v -> selectAvatar(cardViews[index], index));
         }
 
+        // Check if the coTraveller already exists in Firestore
+        if (coTraveller != null) {
+            checkIfCoTravellerExists(coTraveller.getCoTraveller_id());
+        }
+
         btnSave.setOnClickListener(v -> {
             if (coTraveller != null) {
                 coTraveller.setAvatarIndex(selectedAvatarIndex);
 
-                // Save to Firestore
-                saveCoTravellerToFirestore(coTraveller);
+                // Save or update data in Firestore
+                if (isUpdating) {
+                    updateCoTravellerInFirestore(coTraveller);
+                } else {
+                    saveCoTravellerToFirestore(coTraveller);
+                }
             } else {
                 Toast.makeText(getContext(), "No Co-Traveller data found!", Toast.LENGTH_SHORT).show();
             }
@@ -94,6 +113,20 @@ public class CoTravellerAvatarFragment extends Fragment {
         }
     }
 
+    private void checkIfCoTravellerExists(String coTravellerId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("coTravellers").document(coTravellerId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Co-traveller already exists, update UI accordingly
+                        isUpdating = true;
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error checking data!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
     private void saveCoTravellerToFirestore(CoTraveller coTraveller) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -107,7 +140,6 @@ public class CoTravellerAvatarFragment extends Fragment {
                     if (loadingDialog != null && loadingDialog.isShowing()) {
                         loadingDialog.dismiss();
                     }
-                    startActivity(new Intent(requireContext(), CoTravellerActivity.class));// Go back after saving
                     requireActivity().finish();
                 })
                 .addOnFailureListener(e -> {
@@ -115,6 +147,29 @@ public class CoTravellerAvatarFragment extends Fragment {
                         loadingDialog.dismiss();
                     }
                     Toast.makeText(getContext(), "Error saving data!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateCoTravellerInFirestore(CoTraveller coTraveller) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        loadingDialog = new LoadingDialog(requireContext());
+        loadingDialog.setMessage("Updating Data...");
+        loadingDialog.show();
+
+        db.collection("coTravellers").document(coTraveller.getCoTraveller_id())
+                .update("avatarIndex", coTraveller.getAvatarIndex())
+                .addOnSuccessListener(aVoid -> {
+                    if (loadingDialog != null && loadingDialog.isShowing()) {
+                        loadingDialog.dismiss();
+                    }
+                    requireActivity().finish();
+                })
+                .addOnFailureListener(e -> {
+                    if (loadingDialog != null && loadingDialog.isShowing()) {
+                        loadingDialog.dismiss();
+                    }
+                    Toast.makeText(getContext(), "Error updating data!", Toast.LENGTH_SHORT).show();
                 });
     }
 }
