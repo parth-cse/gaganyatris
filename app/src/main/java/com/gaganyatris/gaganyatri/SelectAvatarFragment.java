@@ -1,6 +1,5 @@
 package com.gaganyatris.gaganyatri;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -73,9 +72,7 @@ public class SelectAvatarFragment extends Fragment {
 
         for (int i = 0; i < cardViews.length; i++) {
             final int index = i;
-            cardViews[i].setOnClickListener(v -> {
-                selectAvatar(cardViews[index], index);
-            });
+            cardViews[i].setOnClickListener(v -> selectAvatar(cardViews[index], index));
         }
 
         Button btnSave = view.findViewById(R.id.btn_save);

@@ -52,13 +52,14 @@
         app:layout_constraintTop_toBottomOf="@+id/view2">
 
         <LinearLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="100dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout2"
+                android:id="@+id/baseUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -71,7 +72,7 @@
                     android:id="@+id/cardView"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:foreground="@drawable/avatar_male"
+                    android:foreground="@drawable/ic_avatar_r1"
                     app:cardCornerRadius="999dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:text="@string/parth_jamkhedkar"
+                    android:text="Traveller"
                     android:textAppearance="@style/parth_jamkh"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/cardView"
@@ -97,26 +98,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:gravity="top"
-                    android:text="@string/ppj8988_gmail_com"
+                    android:text="abc@example.com"
                     android:textAppearance="@style/some_id"
                     app:layout_constraintStart_toStartOf="@+id/textView4"
                     app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
-
-            <include layout="@layout/co_traveller_card" />
+            <LinearLayout
+                android:id="@+id/coTravellerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="100dp"/>
 
         </LinearLayout>
     </ScrollView>

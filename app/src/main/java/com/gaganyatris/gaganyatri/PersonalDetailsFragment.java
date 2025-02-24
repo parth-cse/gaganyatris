@@ -1,7 +1,6 @@
 package com.gaganyatris.gaganyatri;
 
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
