@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".InitialFormFragment"
+    android:background="@color/other_bg"
+    android:paddingHorizontal="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="25dp"
+            android:max="3"
+            android:progress="1"
+            android:progressDrawable="@drawable/custom_progress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:elevation="1dp"/>
+
+        <TextView
+            android:id="@+id/textView25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Trip Details"
+            android:textAppearance="@style/settings"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="44dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toTopOf="@+id/btn_save_next"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView25">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="22dp"
+                        android:layout_marginBottom="25dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Trip Start"
+                            android:textAppearance="@style/train_fligh" />
+
+                        <EditText
+                            android:id="@+id/tripStartDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/card_settings"
+                            android:hint="DD/MM/YYYY"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:paddingHorizontal="24dp"
+                            android:paddingVertical="16dp"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/gray"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="25dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Trip End*"
+                            android:textAppearance="@style/train_fligh" />
+
+                        <EditText
+                            android:id="@+id/tripEndDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/card_settings"
+                            android:hint="DD/MM/YYYY"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:paddingHorizontal="24dp"
+                            android:paddingVertical="16dp"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/gray"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="From"
+                        android:textAppearance="@style/train_fligh" />
+
+                    <EditText
+                        android:id="@+id/from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_settings"
+                        android:hint="Search Your Place"
+                        android:inputType="text"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="To*"
+                        android:textAppearance="@style/train_fligh" />
+
+                    <EditText
+                        android:id="@+id/to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_settings"
+                        android:hint="Search Destination"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:orientation="vertical">
+
+                    <Switch
+                        android:id="@+id/explore"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Want to explore nearby places too?"
+                        android:textColor="#33535F"
+                        android:textSize="14dp"
+                        tools:ignore="TextSizeCheck"
+                        android:paddingVertical="5dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Type of Trip"
+                        android:textAppearance="@style/train_fligh" />
+
+                    <EditText
+                        android:id="@+id/type_of_trip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_settings"
+                        android:hint="- - Select - -"
+                        android:inputType="text"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btn_save_next"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Next"
+            android:paddingVertical="15dp"
+            android:textStyle="normal"
+            android:textSize="16sp"
+            android:layout_marginBottom="30dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

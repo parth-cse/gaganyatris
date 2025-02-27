@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment {
         LinearLayout findTickets = view.findViewById(R.id.find_tickets);
         LinearLayout travelGroups = view.findViewById(R.id.travel_groups);
         LinearLayout getGuide = view.findViewById(R.id.get_guide);
+        LinearLayout planYourTrip = view.findViewById(R.id.planYourTrip);
         heyTextView = view.findViewById(R.id.hey);
 
         // Initialize Firebase
@@ -53,6 +54,8 @@ public class HomeFragment extends Fragment {
         findTickets.setOnClickListener(v -> startActivity(new Intent(requireContext(), ModeOfTransportActivity.class)));
         travelGroups.setOnClickListener(v -> startActivity(new Intent(requireContext(), TravelGroupActivity.class)));
         getGuide.setOnClickListener(v -> startActivity(new Intent(requireContext(), GetGuideActivity.class)));
+        planYourTrip.setOnClickListener(v -> startActivity(new Intent(requireContext(), PlanYourTripActivity.class)));
+
 
         return view;
     }

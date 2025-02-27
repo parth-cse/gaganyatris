@@ -32,6 +32,7 @@ public class CoTravellerActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private LoadingDialog loadingDialog;
     private static final String TAG = "CoTravellerActivity";
+    final int statusBarColor = R.color.newStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class CoTravellerActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
         findViewById(R.id.add_co_traveller).setOnClickListener(v -> startActivity(new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class)));
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
         coTravellerContainer = findViewById(R.id.coTravellerContainer);
