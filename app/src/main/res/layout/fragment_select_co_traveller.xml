@@ -52,13 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="100dp">
-
-                <include layout="@layout/co_traveller_card" />
-
-                <include layout="@layout/co_traveller_card" />
-
-            </LinearLayout>
+                android:paddingBottom="100dp"/>
 
         </ScrollView>
 
