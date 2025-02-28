@@ -199,16 +199,45 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Type of Trip"
+                        android:text="Budget"
                         android:textAppearance="@style/train_fligh" />
 
                     <EditText
+                        android:id="@+id/budget"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_settings"
+                        android:hint="Enter Estimate Budget"
+                        android:inputType="number"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Type of Trip"
+                        android:textAppearance="@style/train_fligh" />
+
+                    <AutoCompleteTextView
                         android:id="@+id/type_of_trip"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/card_settings"
                         android:hint="- - Select - -"
-                        android:inputType="text"
+                        android:inputType="none"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
                         android:paddingHorizontal="24dp"
                         android:paddingVertical="16dp"
                         android:textColor="@color/black"
