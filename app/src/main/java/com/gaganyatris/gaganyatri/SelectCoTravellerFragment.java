@@ -1,5 +1,6 @@
 package com.gaganyatris.gaganyatri;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -126,7 +127,17 @@ public class SelectCoTravellerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         exploreSwitch = view.findViewById(R.id.explore);
-        exploreSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> toggleCoTravellerSelection(isChecked));
+        exploreSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                toggleCoTravellerSelection(isChecked);
+                exploreSwitch.setThumbTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.holo_green_dark)));
+                exploreSwitch.setTrackTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.holo_green_light)));
+            } else {
+                toggleCoTravellerSelection(false);
+                exploreSwitch.setThumbTintList(null);
+                exploreSwitch.setTrackTintList(null);
+            }
+        });
 
         if (exploreSwitch.isChecked()) {
             toggleCoTravellerSelection(true);

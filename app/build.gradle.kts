@@ -39,8 +39,10 @@ android {
                 localProperties.load(localPropertiesFile.inputStream())
             }
             val apiKey = localProperties.getProperty("API_KEY", "default_value")
+            val geminiKey = localProperties.getProperty("GEMINI_API_KEY", "default_value")
 
             buildConfigField("String", "API_KEY", "\"$apiKey\"")
+            buildConfigField("String","GEMINI_API_KEY", "\"$geminiKey\"")
         }
     }
 
@@ -64,4 +66,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation("com.google.android.libraries.places:places:4.1.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.google.code.gson:gson:2.8.9")
+
+
 }

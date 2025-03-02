@@ -52,11 +52,12 @@
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/op_flight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
                     android:paddingVertical="15dp"
-                    android:background="@drawable/card_language_active">
+                    android:background="@drawable/card_settings">
 
                     <TextView
                         android:id="@+id/textView5"
@@ -70,9 +71,10 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/flight_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Average Time: 1.5 hrs"
+                        android:text=""
                         android:textAppearance="@style/train_fligh"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -82,6 +84,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/op_train"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
@@ -100,9 +103,10 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/train_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Average Time: 6 hrs"
+                        android:text=""
                         android:textAppearance="@style/train_fligh"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -111,6 +115,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/op_bus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
@@ -129,9 +134,10 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/bus_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Average Time: 5 hrs"
+                        android:text=""
                         android:textAppearance="@style/train_fligh"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -140,6 +146,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/op_others"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
@@ -158,9 +165,10 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/by_road_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Average Time: 4 hrs"
+                        android:text=""
                         android:textAppearance="@style/train_fligh"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
