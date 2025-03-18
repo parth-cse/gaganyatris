@@ -1,6 +1,7 @@
 package com.gaganyatris.gaganyatri;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -27,21 +28,26 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class TravelModeFragment extends Fragment {
 
     private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY; // Replace with your actual API key
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=" + GEMINI_API_KEY;
 
-    private String startDateString, endDateString, from, to, budgetAmount, tripType;
+    private String startDateString, endDateString, from, to, budgetAmount, tripType, averageTime = "5 - 6 hr";
     private boolean exploreNearby;
     private int totalTripDays = 0;
     private String selectedMode = ""; // Variable to store selected travel mode
     ConstraintLayout flightOption, trainOption, busOption, cabOption;
     Button btnSave;
     TextView flightTimeView, trainTimeView, busTimeView, cabTimeView;
+
+    private final Set<String> selectedCoTravellers = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,6 +82,10 @@ public class TravelModeFragment extends Fragment {
             budgetAmount = getArguments().getString("budget", "");
             tripType = getArguments().getString("tripType", "");
             exploreNearby = getArguments().getBoolean("exploreNearby", false);
+            ArrayList<String> coTravellerList = getArguments().getStringArrayList("selectedCoTravellers");
+            if (coTravellerList != null) {
+                selectedCoTravellers.addAll(coTravellerList);
+            }
         }
 
         // Calculate total trip days
@@ -95,7 +105,25 @@ public class TravelModeFragment extends Fragment {
             if (selectedMode.isEmpty()) {
                 Toast.makeText(getContext(), "Please select a travel mode", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "Selected Mode: " + selectedMode, Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(requireContext(), TripDetailsActivity.class);
+                Bundle bundle = new Bundle();
+
+                bundle.putString("tripStartDate", startDateString);
+                bundle.putString("tripEndDate", endDateString);
+                bundle.putString("from", from);
+                bundle.putString("to", to);
+                bundle.putString("budget", budgetAmount);
+                bundle.putString("tripType", tripType);
+                bundle.putBoolean("exploreNearby", exploreNearby);
+                bundle.putStringArrayList("selectedCoTravellers", new ArrayList<>(selectedCoTravellers));
+                bundle.putInt("totalTripDays", totalTripDays);
+                bundle.putString("selectedMode", selectedMode);
+                if(selectedMode.equals("Cab")){
+                    bundle.putString("avgTime", averageTime);
+                }
+
+                i.putExtras(bundle);
+                startActivity(i);
             }
         });
 
@@ -237,11 +265,14 @@ public class TravelModeFragment extends Fragment {
     private void updateUI(String jsonString) {
         try {
             JSONObject travelTimes = new JSONObject(jsonString);
-
+            if(travelTimes.getJSONObject("train") == null){
+                Toast.makeText(requireContext(), "Kuch Gadbad credits me hai", Toast.LENGTH_LONG).show();
+            }
             updateTravelOption("flight", travelTimes.getJSONObject("flight"), flightTimeView, flightOption);
             updateTravelOption("train", travelTimes.getJSONObject("train"), trainTimeView, trainOption);
             updateTravelOption("bus", travelTimes.getJSONObject("bus"), busTimeView, busOption);
             updateTravelOption("cab", travelTimes.getJSONObject("cab"), cabTimeView, cabOption);
+            averageTime = travelTimes.getJSONObject("cab").getString("avg_time");
 
         } catch (Exception e) {
             e.printStackTrace();

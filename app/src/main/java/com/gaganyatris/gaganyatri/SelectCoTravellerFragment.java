@@ -1,5 +1,6 @@
 package com.gaganyatris.gaganyatri;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -46,7 +47,7 @@ public class SelectCoTravellerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_co_traveller, container, false);
-
+        view.findViewById(R.id.add_co_traveller).setOnClickListener(v -> startActivity(new Intent(requireContext(), AddCoTravellerActivity.class)));
         saveNext = view.findViewById(R.id.btn_save);
         coTravellerContainer = view.findViewById(R.id.coTravellerContainer);
         LinearLayout btnBack = view.findViewById(R.id.btn_back);
@@ -93,7 +94,6 @@ public class SelectCoTravellerFragment extends Fragment {
 
     private void addCoTravellerCard(CoTraveller coTraveller) {
         View cardView = getLayoutInflater().inflate(R.layout.select_co_traveller_card, coTravellerContainer, false);
-
         TextView nameTextView = cardView.findViewById(R.id.textView4);
         TextView emailTextView = cardView.findViewById(R.id.some_id);
         ConstraintLayout cardViewmain = cardView.findViewById(R.id.main);
@@ -197,6 +197,7 @@ public class SelectCoTravellerFragment extends Fragment {
         if (exploreSwitch != null) {
             exploreSwitch.post(() -> toggleCoTravellerSelection(exploreSwitch.isChecked()));
         }
+        loadCoTravellers();
     }
 
 

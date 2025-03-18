@@ -20,7 +20,7 @@
         android:background="@color/primaryColor"/>
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tripTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="39dp"
@@ -37,9 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/textView2"
+        app:layout_constraintBottom_toBottomOf="@+id/tripTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="@+id/tripTitle"
         app:srcCompat="@drawable/back_white" />
 
     <ScrollView
@@ -58,9 +58,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/time_gap"
-                app:layout_constraintBottom_toBottomOf="@+id/textView12"
-                app:layout_constraintEnd_toStartOf="@+id/textView12"
-                app:layout_constraintStart_toEndOf="@+id/textView10"
+                app:layout_constraintBottom_toBottomOf="@+id/tripEndDate"
+                app:layout_constraintEnd_toStartOf="@+id/tripEndDate"
+                app:layout_constraintStart_toEndOf="@+id/tripStartDate"
                 app:layout_constraintTop_toTopOf="@+id/textView9" />
 
             <TextView
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="38dp"
-                android:layout_marginTop="42dp"
+                android:layout_marginTop="30dp"
                 android:text="Trip Start"
                 android:textAppearance="@style/trip_start"
                 app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
                 android:id="@+id/textView11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="42dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="38dp"
                 android:text="Trip End"
                 android:textAppearance="@style/trip_start"
@@ -86,27 +86,25 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/tripStartDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="Feb 19, 2025"
                 android:textAppearance="@style/trip_date"
                 app:layout_constraintStart_toStartOf="@+id/textView9"
                 app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
             <TextView
-                android:id="@+id/textView12"
+                android:id="@+id/tripEndDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="Feb 22, 2025"
                 android:textAppearance="@style/trip_date"
                 app:layout_constraintEnd_toEndOf="@+id/textView11"
                 app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
             <TextView
-                android:id="@+id/textView13"
+                android:id="@+id/noOfDays"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -128,7 +126,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+                app:layout_constraintTop_toBottomOf="@+id/tripStartDate" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout6"
@@ -155,7 +153,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/textView14"
+                        android:id="@+id/travelTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Travel Tickets"
@@ -164,15 +162,16 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Indian Railways"
                         android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView14"
-                        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+                        app:layout_constraintStart_toStartOf="@+id/travelTitle"
+                        app:layout_constraintTop_toBottomOf="@+id/travelTitle" />
 
                     <ImageView
-                        android:id="@+id/imageView18"
+                        android:id="@+id/statusIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ticket_confirm"
@@ -181,19 +180,20 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/ticketStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Confirmed"
                         android:textAppearance="@style/verified"
-                        app:layout_constraintBottom_toBottomOf="@+id/imageView18"
-                        app:layout_constraintEnd_toStartOf="@+id/imageView18"
-                        app:layout_constraintTop_toTopOf="@+id/imageView18"
+                        app:layout_constraintBottom_toBottomOf="@+id/statusIcon"
+                        app:layout_constraintEnd_toStartOf="@+id/statusIcon"
+                        app:layout_constraintTop_toTopOf="@+id/statusIcon"
                         android:layout_marginEnd="10dp"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayout4"
+                    android:id="@+id/ticketTo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
@@ -201,139 +201,36 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/top">
-
-                    <ImageView
-                        android:id="@+id/imageView6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:src="@drawable/time_gap"
-                        app:layout_constraintEnd_toStartOf="@+id/textView20"
-                        app:layout_constraintStart_toEndOf="@+id/textView19"
-                        app:layout_constraintTop_toTopOf="@+id/textView19" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:paddingHorizontal="8dp"
-                        android:text="9h"
-                        android:textColor="#33535F"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/imageView6"
-                        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-                        app:layout_constraintStart_toStartOf="@+id/imageView6"
-                        app:layout_constraintTop_toTopOf="@+id/imageView6" />
-
-                    <TextView
-                        android:id="@+id/textView15"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineHeight="18sp"
-                        android:text="Train No.: 17057"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/textView16"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineHeight="18sp"
-                        android:text="PRN: 4731222191"
-                        android:textAppearance="@style/travel_tick"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/addButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="129dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/textView15" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:visibility="gone">
+                        <Button
+                            android:id="@+id/addTicketButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add Ticket"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
 
-                    <TextView
-                        android:id="@+id/textView17"
-                        android:layout_width="wrap_content"
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/ticketTo2"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Deva Giri Express"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView15"
-                        app:layout_constraintTop_toBottomOf="@+id/textView15" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/textView18"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sleeper Class"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView16"
-                        app:layout_constraintTop_toBottomOf="@+id/textView16" />
-
-                    <TextView
-                        android:id="@+id/textView19"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="32dp"
-                        android:text="Web, 19 Feb"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView17"
-                        app:layout_constraintTop_toBottomOf="@+id/textView17" />
-
-                    <TextView
-                        android:id="@+id/textView20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Web, 19 Feb"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView18"
-                        app:layout_constraintTop_toTopOf="@+id/textView19" />
-
-                    <TextView
-                        android:id="@+id/textView21"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="13:30"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintStart_toStartOf="@+id/textView19"
-                        app:layout_constraintTop_toBottomOf="@+id/textView19" />
-
-
-                    <TextView
-                        android:id="@+id/textView22"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="22:30"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintEnd_toEndOf="@+id/textView20"
-                        app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-                    <TextView
-                        android:id="@+id/textView23"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/awb_pf1"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView21"
-                        app:layout_constraintTop_toBottomOf="@+id/textView21" />
-
-                    <TextView
-                        android:id="@+id/textView24"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/lpi_pf1"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView22"
-                        app:layout_constraintTop_toTopOf="@+id/textView23" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aurangabad"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView23"
-                        app:layout_constraintTop_toBottomOf="@+id/textView23" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hyderabad Jn"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView24"
-                        app:layout_constraintTop_toBottomOf="@+id/textView24" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -346,10 +243,10 @@
                     android:background="#262F4B4C"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+                    app:layout_constraintTop_toBottomOf="@+id/ticketTo" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayout5"
+                    android:id="@+id/ticketFro"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
@@ -357,139 +254,35 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/breaker">
-
-                    <TextView
-                        android:id="@+id/textView155"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineHeight="18sp"
-                        android:text="Train No.: 17058"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/textView166"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineHeight="18sp"
-                        android:text="PRN: 4731222192"
-                        android:textAppearance="@style/travel_tick"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/addButton2"
+                        android:layout_width="match_parent"
+                        android:layout_height="129dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/textView155" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:visibility="gone">
+                        <Button
+                            android:id="@+id/addTicketButton2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add Ticket"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
 
-                    <TextView
-                        android:id="@+id/textView177"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Deva Giri Express"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView155"
-                        app:layout_constraintTop_toBottomOf="@+id/textView155" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <TextView
-                        android:id="@+id/textView188"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Deva Giri Express"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView166"
-                        app:layout_constraintTop_toBottomOf="@+id/textView166" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/ticketFro2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
-                    <TextView
-                        android:id="@+id/textView199"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="32dp"
-                        android:text="Fri, 21 Feb"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView177"
-                        app:layout_constraintTop_toBottomOf="@+id/textView177" />
-
-                    <TextView
-                        android:id="@+id/textView200"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sat, 22 Feb"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView188"
-                        app:layout_constraintTop_toTopOf="@+id/textView199" />
-
-                    <TextView
-                        android:id="@+id/textView211"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="22:30"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintStart_toStartOf="@+id/textView199"
-                        app:layout_constraintTop_toBottomOf="@+id/textView199" />
-
-
-                    <TextView
-                        android:id="@+id/textView222"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="06:30"
-                        android:textAppearance="@style/travel_tick"
-                        app:layout_constraintEnd_toEndOf="@+id/textView200"
-                        app:layout_constraintTop_toTopOf="@+id/textView211" />
-
-                    <TextView
-                        android:id="@+id/textView233"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/lpi_pf1"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView211"
-                        app:layout_constraintTop_toBottomOf="@+id/textView211" />
-
-                    <TextView
-                        android:id="@+id/textView244"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/awb_pf1"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView222"
-                        app:layout_constraintTop_toTopOf="@+id/textView233" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hyderabad Jn"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintStart_toStartOf="@+id/textView233"
-                        app:layout_constraintTop_toBottomOf="@+id/textView233" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aurangabad"
-                        android:textAppearance="@style/train_fligh"
-                        app:layout_constraintEnd_toEndOf="@+id/textView244"
-                        app:layout_constraintTop_toBottomOf="@+id/textView244" />
-
-                    <ImageView
-                        android:id="@+id/imageView66"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:src="@drawable/time_gap"
-                        app:layout_constraintEnd_toStartOf="@+id/textView200"
-                        app:layout_constraintStart_toEndOf="@+id/textView199"
-                        app:layout_constraintTop_toTopOf="@+id/textView199" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:paddingHorizontal="8dp"
-                        android:text="9h"
-                        android:textColor="#33535F"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/imageView66"
-                        app:layout_constraintEnd_toEndOf="@+id/imageView66"
-                        app:layout_constraintStart_toStartOf="@+id/imageView66"
-                        app:layout_constraintTop_toTopOf="@+id/imageView66" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -522,6 +315,7 @@
                 android:elevation="1dp">
 
                 <TableLayout
+                    android:id="@+id/coTravellersTable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="20dp"

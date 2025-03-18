@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="100dp">
+            android:paddingBottom="80dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/baseUser"
@@ -109,8 +109,7 @@
                 android:id="@+id/coTravellerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="100dp"/>
+                android:orientation="vertical"/>
 
         </LinearLayout>
     </ScrollView>
