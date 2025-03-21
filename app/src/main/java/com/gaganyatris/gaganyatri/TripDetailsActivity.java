@@ -759,6 +759,16 @@ public class TripDetailsActivity extends AppCompatActivity {
         tripEndTime.setText(endTime);
         tripEndDate.setText(formatDateCab(endDate));
 
+        if(id == findViewById(R.id.ticketTo2)){
+            arrivalAtTripDest = endTime;
+            arrivalDate = endDate;
+        }else{
+            if(id == findViewById(R.id.ticketFro2)){
+                returnTimeFromTripDest = startTime;
+                returnDate = tripDate;
+            }
+        }
+
         id.removeAllViews();
         id.addView(cabView);
 
