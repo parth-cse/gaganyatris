@@ -32,13 +32,14 @@
         tools:targetApi="31">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA1JfZafvx9TVC_DCIAwt9K3xbjIDwH5xI" />
+            android:value="API_KEY" />
         <activity
             android:name=".ImageSearchActivity"
             android:exported="false" />
         <activity
             android:name=".AiChatBotActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ExploreLocationResultActivity"
             android:exported="false" />

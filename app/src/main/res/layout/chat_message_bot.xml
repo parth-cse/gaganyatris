@@ -11,14 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/textView13"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/gagoo_small" />
 
     <TextView
         android:id="@+id/textView13"
-        android:layout_width="170dp"
+        android:layout_width="wrap_content"
+        android:maxWidth="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:background="@drawable/card_settings"
@@ -27,8 +27,8 @@
         android:text="Hey,How may I help you?"
         android:textColor="#2F4B4C"
         android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/userDp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toEndOf="@+id/userDp"
-        app:layout_constraintTop_toTopOf="@+id/userDp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

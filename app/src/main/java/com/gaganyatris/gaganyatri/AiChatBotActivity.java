@@ -3,12 +3,13 @@ package com.gaganyatris.gaganyatri;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -22,7 +23,7 @@ import com.bumptech.glide.Glide;
 import com.gaganyatris.gaganyatri.utils.LoadingDialog;
 import com.gaganyatris.gaganyatri.utils.ZoomImageDialog;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.textview.MaterialTextView; // Corrected import
+import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,13 +37,14 @@ import java.net.URL;
 public class AiChatBotActivity extends AppCompatActivity {
 
     private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=" + GEMINI_API_KEY;
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
 
     private ConstraintLayout msgContainer;
     private ConstraintLayout chatContainer;
     private LinearLayout chatBox;
     private EditText etSearch;
     private ImageView sendButton;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,12 @@ public class AiChatBotActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ai_chat_bot);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()); // Get keyboard insets
+
+            // Adjust bottom padding when keyboard is shown
+            int bottomPadding = Math.max(systemBars.bottom, imeInsets.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+
             return insets;
         });
 
@@ -67,9 +74,10 @@ public class AiChatBotActivity extends AppCompatActivity {
             handleImageSearch(imageUriString);
         } else {
             handleChatBot();
-            addMessageToChat("How may I help you?", false);
+            addMessageToChat("Hey! Myself Gagoo. How may I help you?", false, true);
         }
     }
+
 
     private void handleImageSearch(String imageUriString) {
         msgContainer.setEnabled(false);
@@ -98,14 +106,14 @@ public class AiChatBotActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> {
             String message = etSearch.getText().toString().trim();
             if (!message.isEmpty()) {
-                addMessageToChat(message, true);
+                addMessageToChat(message, true, false);
                 new GeminiApiTask().execute(message);
                 etSearch.getText().clear();
             }
         });
     }
 
-    private void addMessageToChat(String message, boolean isUser) {
+    private void addMessageToChat(String message, boolean isUser, boolean typingAnimation) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View messageView;
         if (isUser) {
@@ -113,9 +121,28 @@ public class AiChatBotActivity extends AppCompatActivity {
         } else {
             messageView = inflater.inflate(R.layout.chat_message_bot, chatBox, false);
         }
-        MaterialTextView messageText = messageView.findViewById(R.id.textView13); // Corrected line
-        messageText.setText(message);
+        MaterialTextView messageText = messageView.findViewById(R.id.textView13);
         chatBox.addView(messageView);
+
+        if (typingAnimation) {
+            animateTextTyping(messageText, message);
+        } else {
+            messageText.setText(message);
+        }
+    }
+
+    private void animateTextTyping(MaterialTextView textView, String message) {
+        final int[] index = {0};
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (index[0] < message.length()) {
+                    textView.setText(message.substring(0, index[0] + 1));
+                    index[0]++;
+                    handler.postDelayed(this, 50);
+                }
+            }
+        });
     }
 
     private void showImageZoom(Uri imageUri) {
@@ -125,18 +152,51 @@ public class AiChatBotActivity extends AppCompatActivity {
 
     private class GeminiApiTask extends AsyncTask<String, Void, String> {
         private LoadingDialog progressDialog;
+        private String userMessage;
+
+        private TextView botMessageText;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new LoadingDialog(AiChatBotActivity.this);
-            progressDialog.setMessage("Loading...");
-            progressDialog.show();
+
+            // Add a temporary bot message with the "thinking" animation
+            LayoutInflater inflater = LayoutInflater.from(AiChatBotActivity.this);
+            View botMessageView = inflater.inflate(R.layout.chat_message_bot, chatBox, false);
+            botMessageText = botMessageView.findViewById(R.id.textView13);
+            chatBox.addView(botMessageView);
+            animateThinkingDots(botMessageText);
+        }
+
+        private void animateThinkingDots(final TextView textView) {
+            final String[] dots = {".", "..", "..."};
+            final int[] index = {0};
+            final Handler handler = new Handler();
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    textView.setText(dots[index[0]]);
+                    index[0] = (index[0] + 1) % 3; // Cycle through dots
+                    handler.postDelayed(this, 500); // Adjust delay for speed
+                }
+            };
+            handler.post(runnable);
+            textView.setTag(runnable); // Store runnable to cancel later
+        }
+
+        private void stopThinkingAnimation(TextView textView) {
+            Handler handler = new Handler();
+            Runnable runnable = (Runnable) textView.getTag();
+            if (runnable != null) {
+                handler.removeCallbacks(runnable);
+            }
+            botMessageText.setVisibility(View.GONE);
         }
 
         @Override
         protected String doInBackground(String... messages) {
-            String message = messages[0];
+            userMessage = messages[0];
             try {
                 URL url = new URL(GEMINI_API_URL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -149,7 +209,7 @@ public class AiChatBotActivity extends AppCompatActivity {
                 JSONObject contentsObject = new JSONObject();
                 JSONArray partsArray = new JSONArray();
                 JSONObject partsObject = new JSONObject();
-                partsObject.put("text", message);
+                partsObject.put("text", "Act as a Travel Guide named Gagoo and answer the User Query: "+userMessage+" when If User asked you about yur name reply it as Gagoo and please keep your response consive to 300 characters. Reply in paragraph form only.");
                 partsArray.put(partsObject);
                 contentsObject.put("parts", partsArray);
                 contentsArray.put(contentsObject);
@@ -183,29 +243,32 @@ public class AiChatBotActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
+            stopThinkingAnimation(botMessageText);
             try {
-                String parsedResult = parseJsonResponse(result);
+                String parsedResult = parseJsonResponse(result, userMessage);
                 if (parsedResult != null) {
-                    addMessageToChat(parsedResult, false);
+                    addMessageToChat(parsedResult, false, true);
+                } else {
+                    addMessageToChat("Sorry, I couldn't get a response.", false, true);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(AiChatBotActivity.this, "Error parsing API response", Toast.LENGTH_LONG).show();
+                addMessageToChat("Sorry, there was an error.", false, true);
             }
         }
     }
 
-    private String parseJsonResponse(String jsonResponse) {
+    private String parseJsonResponse(String jsonResponse, String userMessage) {
         try {
+//            if (userMessage.toLowerCase().contains("what's your name") || userMessage.toLowerCase().contains("what is your name") || userMessage.toLowerCase().contains("your name")) {
+//                return "My name is Gagoo!";
+//            }
             JSONObject jsonObject = new JSONObject(jsonResponse);
             JSONArray candidates = jsonObject.getJSONArray("candidates");
             JSONObject firstCandidate = candidates.getJSONObject(0);
             JSONObject contentObject = firstCandidate.getJSONObject("content");
             JSONArray parts = contentObject.getJSONArray("parts");
-            return parts.getJSONObject(0).getString("text");
+            return parts.getJSONObject(0).getString("text").trim();
 
         } catch (Exception e) {
             e.printStackTrace();
