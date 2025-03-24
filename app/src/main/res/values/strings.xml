@@ -60,4 +60,5 @@
     <string name="awb_pf1"><b>AWB</b> PF1</string>
     <string name="lpi_pf1"><b>LPI</b> PF5</string>
     <string name="explore_your_location">EXPLORE YOUR\nLOCATION</string>
+    <string name="search_information_br_with_your_photo">Search Information\nwith Your Photo</string>
 </resources>

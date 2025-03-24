@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
         LinearLayout getGuide = view.findViewById(R.id.get_guide);
         LinearLayout planYourTrip = view.findViewById(R.id.planYourTrip);
         heyTextView = view.findViewById(R.id.hey);
+        view.findViewById(R.id.cameraLens).setOnClickListener(v-> startActivity(new Intent(requireContext(), ImageSearchActivity.class)));
 
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
@@ -55,8 +56,7 @@ public class HomeFragment extends Fragment {
         travelGroups.setOnClickListener(v -> startActivity(new Intent(requireContext(), TravelGroupActivity.class)));
         getGuide.setOnClickListener(v -> startActivity(new Intent(requireContext(), GetGuideActivity.class)));
         planYourTrip.setOnClickListener(v -> startActivity(new Intent(requireContext(), PlanYourTripActivity.class)));
-
-
+        view.findViewById(R.id.exploreLocation).setOnClickListener(v -> startActivity(new Intent(requireContext(), ExploreYourLocationActivity.class)));
         return view;
     }
 
