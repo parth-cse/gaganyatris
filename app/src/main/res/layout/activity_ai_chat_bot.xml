@@ -31,11 +31,6 @@
             app:layout_constraintTop_toTopOf="parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textView14"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

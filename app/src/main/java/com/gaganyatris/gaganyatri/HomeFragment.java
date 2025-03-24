@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment {
         LinearLayout planYourTrip = view.findViewById(R.id.planYourTrip);
         heyTextView = view.findViewById(R.id.hey);
         view.findViewById(R.id.cameraLens).setOnClickListener(v-> startActivity(new Intent(requireContext(), ImageSearchActivity.class)));
+        view.findViewById(R.id.gagoo).setOnClickListener(v->startActivity(new Intent(requireContext(), AiChatBotActivity.class)));
 
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
