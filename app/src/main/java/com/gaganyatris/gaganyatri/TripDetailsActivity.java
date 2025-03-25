@@ -52,6 +52,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 public class TripDetailsActivity extends AppCompatActivity {
     private final int statusBarColor = R.color.primaryColor;
@@ -686,6 +687,7 @@ public class TripDetailsActivity extends AppCompatActivity {
         TextView tripEndTime = cabView.findViewById(R.id.tripTitle2);
         TextView source = cabView.findViewById(R.id.source);
         TextView dest = cabView.findViewById(R.id.destination);
+        TextView dur = cabView.findViewById(R.id.duration);
 
         cabNumberView.setText("Vehicle No.: " + cabNumber);
         tripDateView.setText(formatDateCab(tripDate)); // Use selected trip date
@@ -693,7 +695,8 @@ public class TripDetailsActivity extends AppCompatActivity {
         source.setText(from);
         dest.setText(to);
 
-        if (id == findViewById(R.id.ticketFro2)){
+
+        if (id == findViewById(R.id.ticketFro2)) {
             cabNumberView.setVisibility(View.GONE);
         }
 
@@ -759,28 +762,48 @@ public class TripDetailsActivity extends AppCompatActivity {
         tripEndTime.setText(endTime);
         tripEndDate.setText(formatDateCab(endDate));
 
-        if(id == findViewById(R.id.ticketTo2)){
+        // Calculate duration in hours and minutes
+        int durationHours = avgHours;
+        int durationMinutes = 0; // Initialize minutes to 0
+
+        // Extract minutes if present in avgTime
+        Pattern minutesPattern = Pattern.compile("(\\d+) min");
+        Matcher minutesMatcher = minutesPattern.matcher(avgTime.trim());
+
+        if (minutesMatcher.find()) {
+            durationMinutes = Integer.parseInt(minutesMatcher.group(1));
+        }
+
+        // Set duration in TextView dur
+         if (durationMinutes > 0) {
+                dur.setText(String.format(Locale.getDefault(), "%d hr %02d mins", durationHours, durationMinutes));
+            } else {
+                dur.setText(String.format(Locale.getDefault(), "%d hr", durationHours));
+            }
+
+        if (id == findViewById(R.id.ticketTo2)) {
             arrivalAtTripDest = endTime;
             arrivalDate = endDate;
-        }else{
-            if(id == findViewById(R.id.ticketFro2)){
+        } else {
+            if (id == findViewById(R.id.ticketFro2)) {
                 returnTimeFromTripDest = startTime;
                 returnDate = tripDate;
+                source.setText(to);
+                dest.setText(from);
             }
         }
 
         id.removeAllViews();
         id.addView(cabView);
 
-        if (id == findViewById(R.id.ticketTo2)){
+        if (id == findViewById(R.id.ticketTo2)) {
             tripTicketEnteredTo = true;
             checkTripTicketEntered();
-        }else if(id == findViewById(R.id.ticketFro2)){
-            tripTicketEnteredFro=true;
+        } else if (id == findViewById(R.id.ticketFro2)) {
+            tripTicketEnteredFro = true;
             checkTripTicketEntered();
         }
     }
-
     private void pickTime(TextView timeTextView) {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);

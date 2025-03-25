@@ -200,9 +200,9 @@ public class ExploreLocationResultActivity extends AppCompatActivity {
                 String Mode = "Available Mode of Transport: " + location.getString("available mode");
                 String mapLink = location.getString("Map Location");
 
-                activityName.setText(location.getString("Activity Name"));
+                activityName.setText(location.getString("name"));
                 timeTextView.setText(location.getString("time required"));
-                locationTextView.setText(location.getString("name"));
+                locationTextView.setText(location.getString("Activity Name"));
                 modeTextView.setText(Mode);
                 descriptionTextView.setText("Location Description: " + location.getString("Location Description"));
 

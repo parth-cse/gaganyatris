@@ -50,7 +50,7 @@
         android:scrollbars="none">
 
         <LinearLayout
-            android:layout_marginTop="16dp"
+            android:layout_marginVertical="16dp"
             android:id="@+id/activityContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

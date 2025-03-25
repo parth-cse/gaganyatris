@@ -209,7 +209,7 @@ public class AiChatBotActivity extends AppCompatActivity {
                 JSONObject contentsObject = new JSONObject();
                 JSONArray partsArray = new JSONArray();
                 JSONObject partsObject = new JSONObject();
-                partsObject.put("text", "Act as a Travel Guide named Gagoo and answer the User Query: "+userMessage+" when If User asked you about yur name reply it as Gagoo and please keep your response consive to 300 characters. Reply in paragraph form only.");
+                partsObject.put("text", "Act as a Travel Guide named 'Nimbus' and answer the User Query: " +userMessage+" when If User asked you about yur name reply it as Gagoo and please keep your response consive to 300 characters. Reply in paragraph form only.");
                 partsArray.put(partsObject);
                 contentsObject.put("parts", partsArray);
                 contentsArray.put(contentsObject);
