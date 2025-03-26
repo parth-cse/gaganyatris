@@ -1,6 +1,7 @@
 package com.gaganyatris.gaganyatri;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -21,12 +22,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.gaganyatris.gaganyatri.utils.LoadingDialog;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class PersonalDetailsFragment extends Fragment {
@@ -65,27 +69,15 @@ public class PersonalDetailsFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null && user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty()) {
             String phoneNumber = user.getPhoneNumber();
-
-            // Extract the country code from the full phone number
-
-            //End of Modified Part of code
-
-            // Remove the country code from the phone number
             String localPhoneNumber = countryCode.getFullNumber();
-
-            // Set the extracted values
             pNo.setText(localPhoneNumber);
             pNo.setEnabled(false);
-
-            // Set the CountryCodePicker
             countryCode.setFullNumber(phoneNumber);
             countryCode.setEnabled(false);
         }
 
         return view;
     }
-
-// other imports
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -121,8 +113,18 @@ public class PersonalDetailsFragment extends Fragment {
                             // Retrieve data from Firestore
                             iName = documentSnapshot.getString("name");
                             iEmail = documentSnapshot.getString("email");
-                            iPNo = documentSnapshot.getString("phone");
-                            iDob = documentSnapshot.getString("dob");
+                            iPNo = documentSnapshot.getString("phone"); // Retrieve phone from Firestore
+
+                            Object dobObject = documentSnapshot.get("dob");
+                            if (dobObject instanceof Timestamp) {
+                                Date dobDate = ((Timestamp) dobObject).toDate();
+                                iDob = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dobDate);
+                            } else if (dobObject instanceof String) {
+                                iDob = (String) dobObject;
+                            } else {
+                                iDob = "";
+                            }
+
                             iGender = documentSnapshot.getString("gender");
                             iCountry = documentSnapshot.getString("country");
                             iState = documentSnapshot.getString("state");
@@ -137,10 +139,50 @@ public class PersonalDetailsFragment extends Fragment {
                             state.setText(iState);
                             city.setText(iCity);
 
-                            // Disable fields if data exists
-                            pNo.setEnabled(false);
-                            // Disable CountryCodePicker
-                            countryCode.setEnabled(false);
+                            // Check if user is signed in with Google
+                            boolean isGoogleSignIn = (user.getEmail() != null && !user.getEmail().isEmpty());
+
+                            if (isGoogleSignIn) {
+                                // If authenticated via Google, retrieve phone number from Firestore
+                                if (iPNo != null && !iPNo.isEmpty()) {
+                                    pNo.setText(iPNo);
+                                    countryCode.setFullNumber(iPNo);
+                                }
+                                // Make phone number editable only when signed in via Google
+                                pNo.setEnabled(true);
+                                countryCode.setEnabled(true);
+                            } else {
+                                // For other sign-in methods, disable phone number
+                                pNo.setEnabled(false);
+                                countryCode.setEnabled(false);
+                            }
+
+                            if (isGoogleSignIn) {
+                                email.setEnabled(false); // Disable email editing for Google sign-in
+                            }
+                        } else {
+                            // User does not exist, check authentication method
+                            if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+                                // Google Sign-In, pre-fill email
+                                email.setText(user.getEmail());
+                                email.setEnabled(false); // Disable email editing
+
+                                // Fetch and display phone number from Firestore
+                                if (iPNo != null && !iPNo.isEmpty()) {
+                                    pNo.setText(iPNo);
+                                    countryCode.setFullNumber(iPNo);
+                                }
+                                pNo.setEnabled(true);
+                                countryCode.setEnabled(true);
+                            } else {
+                                // User not found and not Google Sign-In, log out
+                                FirebaseAuth.getInstance().signOut();
+                                Intent intent = new Intent(requireContext(), OnBoardingActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                requireActivity().finish();
+                                Toast.makeText(requireContext(), "User data not found, please sign up again.", Toast.LENGTH_LONG).show();
+                            }
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -174,8 +216,6 @@ public class PersonalDetailsFragment extends Fragment {
             }
         });
     }
-
-
 
     private boolean validateFields() {
         iName = name.getText().toString().trim();
@@ -243,7 +283,7 @@ public class PersonalDetailsFragment extends Fragment {
 
         // Set max date (current date - 16 years)
         Calendar maxDateCalendar = Calendar.getInstance();
-        maxDateCalendar.set(Calendar.YEAR, year - 16);
+        maxDateCalendar.add(Calendar.YEAR, -16);
         datePickerDialog.getDatePicker().setMaxDate(maxDateCalendar.getTimeInMillis());
 
         datePickerDialog.show();

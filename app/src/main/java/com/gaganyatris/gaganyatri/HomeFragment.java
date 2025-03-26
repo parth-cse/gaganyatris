@@ -20,12 +20,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class HomeFragment extends Fragment {
 
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private TextView heyTextView;
+    private ListenerRegistration firestoreListener; // Add ListenerRegistration
 
     public HomeFragment() {
         // Required empty public constructor
@@ -63,11 +65,13 @@ public class HomeFragment extends Fragment {
 
     private void loadUserData(String userId) {
         DocumentReference userRef = db.collection("users").document(userId);
-        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        firestoreListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() { // Store the registration
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
-                    Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
+                    if(isAdded()) { //check if the fragment is added.
+                        Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
+                    }
                     return;
                 }
 
@@ -83,5 +87,13 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (firestoreListener != null) {
+            firestoreListener.remove(); // Remove the listener
+        }
     }
 }

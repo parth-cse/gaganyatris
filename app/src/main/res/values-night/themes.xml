@@ -3,5 +3,6 @@
     <style name="Base.Theme.Gaganyatri" parent="Theme.Material3.DayNight.NoActionBar">
          Customize your dark theme here.
          <item name="colorPrimary">@color/primaryColor</item>
+        <item name="android:fontFamily">@font/custom_font_family</item>
     </style>
 </resources>

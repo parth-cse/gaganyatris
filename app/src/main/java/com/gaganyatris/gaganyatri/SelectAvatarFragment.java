@@ -122,17 +122,10 @@ public class SelectAvatarFragment extends Fragment {
                                         loadingDialog.dismiss();
                                     }
 
-                                    // Navigate back based on the calling activity
-                                    if (getActivity() instanceof OTPVerificationActivity) {
-                                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear the back stack
-                                        startActivity(intent);
-                                    } else {
-                                        // If called from another activity, simply finish the current activity
-                                        if (getActivity() != null) {
-                                            getActivity().finish();
-                                        }
-                                    }
+                                    // Navigate to MainActivity
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear the back stack
+                                    startActivity(intent);
 
                                 })
                                 .addOnFailureListener(e -> {

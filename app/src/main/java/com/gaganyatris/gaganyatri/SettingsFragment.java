@@ -10,17 +10,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.gaganyatris.gaganyatri.models.Users;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import androidx.annotation.Nullable;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -31,6 +31,7 @@ public class SettingsFragment extends Fragment {
     private ImageView avatarImage;
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
+    private ListenerRegistration firestoreListener;
 
     private final int[] avatarResources = {
             R.drawable.ic_avatar_r1, R.drawable.ic_avatar_r2, R.drawable.ic_avatar_r3,
@@ -50,10 +51,11 @@ public class SettingsFragment extends Fragment {
         // Initialize UI elements
         fnameField = view.findViewById(R.id.fname_field);
         pNoField = view.findViewById(R.id.pNoField);
-        avatarImage = view.findViewById(R.id.avatarImage); // Make sure it's an ImageView in XML
+        avatarImage = view.findViewById(R.id.avatarImage);
 
+        // Load user data only if user is logged in
         if (currentUser != null) {
-            loadUserData(currentUser.getUid()); // Load user data from Firestore
+            loadUserData(currentUser.getUid());
         }
 
         // Set up button actions
@@ -70,19 +72,22 @@ public class SettingsFragment extends Fragment {
 
     private void loadUserData(String userId) {
         DocumentReference userRef = db.collection("users").document(userId);
-        userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+
+        firestoreListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
-                    Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) { // Prevent crashes if fragment is detached
+                        Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
+                    }
                     return;
                 }
 
                 if (snapshot != null && snapshot.exists()) {
                     String name = snapshot.getString("name");
                     String phone = snapshot.getString("phone");
-                    Long avatarIndexLong = snapshot.getLong("avatarIndex"); // Fetch avatar index
-                    Object dobObject = snapshot.get("dateOfBirth"); // Fetch DOB
+                    Long avatarIndexLong = snapshot.getLong("avatarIndex");
+                    Object dobObject = snapshot.get("dateOfBirth");
 
                     String dateOfBirth = "";
                     if (dobObject instanceof com.google.firebase.Timestamp) {
@@ -92,17 +97,20 @@ public class SettingsFragment extends Fragment {
                         dateOfBirth = (String) dobObject;
                     }
 
-                    fnameField.setText(name != null ? name : "User");
-                    pNoField.setText(phone != null ? phone : "+91 XXXXXXXXXX");
+                    // Update UI only if fragment is attached
+                    if (isAdded()) {
+                        fnameField.setText(name != null ? name : "User");
+                        pNoField.setText(phone != null ? phone : "+91 XXXXXXXXXX");
 
-                    // Debugging log
-                    System.out.println("User DOB: " + dateOfBirth);
+                        // Debugging log
+                        System.out.println("User DOB: " + dateOfBirth);
 
-                    // Set avatar image
-                    if (avatarIndexLong != null) {
-                        int avatarIndex = avatarIndexLong.intValue();
-                        if (avatarIndex >= 0 && avatarIndex < avatarResources.length) {
-                            avatarImage.setImageResource(avatarResources[avatarIndex]);
+                        // Set avatar image
+                        if (avatarIndexLong != null) {
+                            int avatarIndex = avatarIndexLong.intValue();
+                            if (avatarIndex >= 0 && avatarIndex < avatarResources.length) {
+                                avatarImage.setImageResource(avatarResources[avatarIndex]);
+                            }
                         }
                     }
                 }
@@ -110,8 +118,22 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (firestoreListener != null) {
+            firestoreListener.remove(); // Remove Firestore listener
+            firestoreListener = null;
+        }
+    }
 
     private void signOut() {
+        // Remove Firestore listener before signing out
+        if (firestoreListener != null) {
+            firestoreListener.remove();
+            firestoreListener = null;
+        }
+
         FirebaseAuth.getInstance().signOut();
 
         Intent intent = new Intent(requireContext(), OnBoardingActivity.class);
