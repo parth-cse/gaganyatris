@@ -17,129 +17,108 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class SettingsFragment extends Fragment {
 
-    private TextView fnameField, pNoField;
-    private ImageView avatarImage;
-    private FirebaseFirestore db;
+    private TextView nameTextView, phoneTextView;
+    private ImageView avatarImageView;
+    private FirebaseFirestore firestoreDB;
     private FirebaseUser currentUser;
     private ListenerRegistration firestoreListener;
 
-    private final int[] avatarResources = {
+    private static final int[] AVATAR_RESOURCES = {
             R.drawable.ic_avatar_r1, R.drawable.ic_avatar_r2, R.drawable.ic_avatar_r3,
             R.drawable.ic_avatar_r4, R.drawable.ic_avatar_r5, R.drawable.ic_avatar_r6,
             R.drawable.ic_avatar_r7, R.drawable.ic_avatar_r8, R.drawable.ic_avatar_r9
     };
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
-
-        // Initialize Firebase Firestore
-        db = FirebaseFirestore.getInstance();
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        // Initialize UI elements
-        fnameField = view.findViewById(R.id.fname_field);
-        pNoField = view.findViewById(R.id.pNoField);
-        avatarImage = view.findViewById(R.id.avatarImage);
-
-        // Load user data only if user is logged in
-        if (currentUser != null) {
-            loadUserData(currentUser.getUid());
-        }
-
-        // Set up button actions
-        view.findViewById(R.id.button).setOnClickListener(v -> startActivity(new Intent(requireContext(), UserDetailActivity.class)));
-        view.findViewById(R.id.co_traveller_btn).setOnClickListener(v -> startActivity(new Intent(requireContext(), CoTravellerActivity.class)));
-        view.findViewById(R.id.logout).setOnClickListener(v -> signOut());
-        view.findViewById(R.id.change_language).setOnClickListener(v -> startActivity(new Intent(requireContext(), ChangeLanguageActivity.class)));
-        view.findViewById(R.id.changeUI).setOnClickListener(v -> startActivity(new Intent(requireContext(), UiModeActivity.class)));
-        view.findViewById(R.id.travel_settings).setOnClickListener(v -> startActivity(new Intent(requireContext(), TravelSettingsActivity.class)));
-        view.findViewById(R.id.help).setOnClickListener(v -> startActivity(new Intent(requireContext(), HelpSupportActivity.class)));
-
+        initialize(view);
+        setupClickListeners(view);
+        fetchUserData();
         return view;
     }
 
-    private void loadUserData(String userId) {
-        DocumentReference userRef = db.collection("users").document(userId);
+    private void initialize(View view) {
+        firestoreDB = FirebaseFirestore.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        nameTextView = view.findViewById(R.id.fname_field);
+        phoneTextView = view.findViewById(R.id.pNoField);
+        avatarImageView = view.findViewById(R.id.avatarImage);
+    }
 
-        firestoreListener = userRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    if (isAdded()) { // Prevent crashes if fragment is detached
-                        Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
-                    }
-                    return;
-                }
+    private void setupClickListeners(View view) {
+        view.findViewById(R.id.button).setOnClickListener(v -> navigate(UserDetailActivity.class));
+        view.findViewById(R.id.co_traveller_btn).setOnClickListener(v -> navigate(CoTravellerActivity.class));
+        view.findViewById(R.id.logout).setOnClickListener(v -> signOut());
+        view.findViewById(R.id.change_language).setOnClickListener(v -> navigate(ChangeLanguageActivity.class));
+        view.findViewById(R.id.changeUI).setOnClickListener(v -> navigate(UiModeActivity.class));
+        view.findViewById(R.id.travel_settings).setOnClickListener(v -> navigate(TravelSettingsActivity.class));
+        view.findViewById(R.id.help).setOnClickListener(v -> navigate(HelpSupportActivity.class));
+    }
 
-                if (snapshot != null && snapshot.exists()) {
-                    String name = snapshot.getString("name");
-                    String phone = snapshot.getString("phone");
-                    Long avatarIndexLong = snapshot.getLong("avatarIndex");
-                    Object dobObject = snapshot.get("dateOfBirth");
+    private void fetchUserData() {
+        if (currentUser == null) return;
+        DocumentReference userRef = firestoreDB.collection("users").document(currentUser.getUid());
+        firestoreListener = userRef.addSnapshotListener(this::handleUserDataSnapshot);
+    }
 
-                    String dateOfBirth = "";
-                    if (dobObject instanceof com.google.firebase.Timestamp) {
-                        dateOfBirth = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                .format(((com.google.firebase.Timestamp) dobObject).toDate());
-                    } else if (dobObject instanceof String) {
-                        dateOfBirth = (String) dobObject;
-                    }
+    private void handleUserDataSnapshot(@Nullable DocumentSnapshot snapshot, @Nullable Exception error) {
+        if (error != null) {
+            showToast("Error loading user data");
+            return;
+        }
 
-                    // Update UI only if fragment is attached
-                    if (isAdded()) {
-                        fnameField.setText(name != null ? name : "User");
-                        pNoField.setText(phone != null ? phone : "+91 XXXXXXXXXX");
+        if (snapshot != null && snapshot.exists() && isAdded()) {
+            nameTextView.setText(snapshot.getString("name") != null ? snapshot.getString("name") : "User");
+            phoneTextView.setText(snapshot.getString("phone") != null ? snapshot.getString("phone") : "+91 XXXXXXXXXX");
+            updateAvatar(snapshot.getLong("avatarIndex"));
+        }
+    }
 
-                        // Debugging log
-                        System.out.println("User DOB: " + dateOfBirth);
-
-                        // Set avatar image
-                        if (avatarIndexLong != null) {
-                            int avatarIndex = avatarIndexLong.intValue();
-                            if (avatarIndex >= 0 && avatarIndex < avatarResources.length) {
-                                avatarImage.setImageResource(avatarResources[avatarIndex]);
-                            }
-                        }
-                    }
-                }
+    private void updateAvatar(Long avatarIndexLong) {
+        if (avatarIndexLong != null) {
+            int avatarIndex = avatarIndexLong.intValue();
+            if (avatarIndex >= 0 && avatarIndex < AVATAR_RESOURCES.length) {
+                avatarImageView.setImageResource(AVATAR_RESOURCES[avatarIndex]);
             }
-        });
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (firestoreListener != null) {
-            firestoreListener.remove(); // Remove Firestore listener
+            firestoreListener.remove();
             firestoreListener = null;
         }
     }
 
     private void signOut() {
-        // Remove Firestore listener before signing out
         if (firestoreListener != null) {
             firestoreListener.remove();
             firestoreListener = null;
         }
 
         FirebaseAuth.getInstance().signOut();
-
         Intent intent = new Intent(requireContext(), OnBoardingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         requireActivity().finish();
-        Toast.makeText(requireContext(), "Logged Out Successfully", Toast.LENGTH_SHORT).show();
+        showToast("Logged Out Successfully");
+    }
+
+    private void navigate(Class<?> destination) {
+        startActivity(new Intent(requireContext(), destination));
+    }
+
+    private void showToast(String message) {
+        if (isAdded()) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -21,10 +21,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HelpSupportActivity extends AppCompatActivity {
 
-    final int statusBarColor = R.color.newStatusBar;
-    ImageButton backBtn;
+    private static final int ANIMATION_DURATION = 300;
+    private static final String EMAIL_ADDRESS = "parthjamkhedkarjnec@gmail.com";
+    private static final int STATUS_BAR_COLOR = R.color.newStatusBar;
+
+    private LinearLayout optionsLayout;
+    private View bgView;
+    private ImageButton backBtn;
+
+    // Store question-answer pairs for easier management
+    private final Map<Integer, Integer> questionAnswerMap = new HashMap<>();
+    private final Map<Integer, Integer> questionArrowMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +49,33 @@ public class HelpSupportActivity extends AppCompatActivity {
             return insets;
         });
 
+        initializeViews();
+        setupClickListeners();
+        setupOnBackPressed();
+    }
 
-        LinearLayout optionsLayout = findViewById(R.id.optionsLayout);
-        View bgView = findViewById(R.id.bg); // Initialize the background view
-
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
-
+    private void initializeViews() {
+        optionsLayout = findViewById(R.id.optionsLayout);
+        bgView = findViewById(R.id.bg);
         backBtn = findViewById(R.id.backBtn);
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, STATUS_BAR_COLOR));
+
+        // Populate the maps for question-answer and question-arrow pairs
+        questionAnswerMap.put(R.id.question1_layout, R.id.question1_answer);
+        questionAnswerMap.put(R.id.question2_layout, R.id.question2_answer);
+        questionAnswerMap.put(R.id.question3_layout, R.id.question3_answer);
+        questionAnswerMap.put(R.id.question4_layout, R.id.question4_answer);
+        questionAnswerMap.put(R.id.question5_layout, R.id.question5_answer);
+
+        questionArrowMap.put(R.id.question1_layout, R.id.q1_arrow);
+        questionArrowMap.put(R.id.question2_layout, R.id.q2_arrow);
+        questionArrowMap.put(R.id.question3_layout, R.id.q3_arrow);
+        questionArrowMap.put(R.id.question4_layout, R.id.q4_arrow);
+        questionArrowMap.put(R.id.question5_layout, R.id.q5_arrow);
+    }
+
+    private void setupClickListeners() {
         backBtn.setOnClickListener(view -> finish());
 
         findViewById(R.id.contactUsBTN).setOnClickListener(v -> {
@@ -51,79 +83,62 @@ public class HelpSupportActivity extends AppCompatActivity {
             optionsLayout.setVisibility(View.VISIBLE);
         });
 
-        findViewById(R.id.bg).setOnClickListener(v -> {
-            if (optionsLayout.getVisibility() == View.VISIBLE) {
-                optionsLayout.setVisibility(View.GONE);
-                bgView.setVisibility(View.GONE);
+        bgView.setOnClickListener(v -> hideOptions());
+
+        // Set click listeners for all questions using the map
+        for (Map.Entry<Integer, Integer> entry : questionAnswerMap.entrySet()) {
+            int questionLayoutId = entry.getKey();
+            View questionLayout = findViewById(questionLayoutId);
+            if (questionLayout != null) {
+                questionLayout.setOnClickListener(v ->
+                        toggleQuestion(v, findViewById(questionAnswerMap.get(questionLayoutId)), findViewById(questionArrowMap.get(questionLayoutId))));
             }
-        });
+        }
 
-        findViewById(R.id.question1_layout).setOnClickListener(v ->
-                toggleQuestion(v, findViewById(R.id.question1_answer), findViewById(R.id.q1_arrow)));
+        findViewById(R.id.sendEmail).setOnClickListener(v -> sendEmail());
+    }
 
-        findViewById(R.id.question2_layout).setOnClickListener(v ->
-                toggleQuestion(v, findViewById(R.id.question2_answer), findViewById(R.id.q2_arrow)));
-
-        findViewById(R.id.question3_layout).setOnClickListener(v ->
-                toggleQuestion(v, findViewById(R.id.question3_answer), findViewById(R.id.q3_arrow)));
-
-        findViewById(R.id.question4_layout).setOnClickListener(v ->
-                toggleQuestion(v, findViewById(R.id.question4_answer), findViewById(R.id.q4_arrow)));
-
-        findViewById(R.id.question5_layout).setOnClickListener(v ->
-                toggleQuestion(v, findViewById(R.id.question5_answer), findViewById(R.id.q5_arrow)));
-
+    private void setupOnBackPressed() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (optionsLayout.getVisibility() == View.VISIBLE) {
-                    optionsLayout.setVisibility(View.GONE);
-                    bgView.setVisibility(View.GONE);
+                    hideOptions();
                 } else {
                     finish();
                 }
             }
         });
+    }
 
-        findViewById(R.id.sendEmail).setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_SENDTO); // Use ACTION_SENDTO
-            intent.setData(Uri.parse("mailto:parthjamkhedkarjnec@gmail.com"));
-
-            try {
-                startActivity(Intent.createChooser(intent, "Send Email"));
-            } catch (android.content.ActivityNotFoundException e) {
-                Toast.makeText(HelpSupportActivity.this, "No email app found", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+    private void hideOptions() {
+        if (optionsLayout.getVisibility() == View.VISIBLE) {
+            optionsLayout.setVisibility(View.GONE);
+            bgView.setVisibility(View.GONE);
+        }
     }
 
     private void toggleQuestion(View layout, TextView answer, ImageView arrow) {
         boolean isVisible = answer.getVisibility() == View.VISIBLE;
 
-        // Collapse all other answers before expanding the selected one
         collapseAllQuestions();
 
         if (isVisible) {
-            // Hide answer with smooth animation
             animateCollapse(answer);
             rotateArrow(arrow, 180f, 0f);
         } else {
-            // Show answer with smooth animation
             animateExpand(answer);
             rotateArrow(arrow, 0f, 180f);
         }
     }
 
-    // Rotates the arrow smoothly
     private void rotateArrow(ImageView arrow, float from, float to) {
         ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(arrow, "rotation", from, to);
-        rotateAnimator.setDuration(300);
+        rotateAnimator.setDuration(ANIMATION_DURATION);
         rotateAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         rotateAnimator.start();
     }
 
-    // Expands the answer with smooth animation
     private void animateExpand(TextView answer) {
         answer.measure(View.MeasureSpec.makeMeasureSpec(((View) answer.getParent()).getWidth(), View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -137,11 +152,10 @@ public class HelpSupportActivity extends AppCompatActivity {
             answer.requestLayout();
         });
 
-        animator.setDuration(300);
+        animator.setDuration(ANIMATION_DURATION);
         animator.start();
     }
 
-    // Collapses the answer smoothly
     private void animateCollapse(TextView answer) {
         int initialHeight = answer.getHeight();
 
@@ -151,7 +165,7 @@ public class HelpSupportActivity extends AppCompatActivity {
             answer.requestLayout();
         });
 
-        animator.setDuration(300);
+        animator.setDuration(ANIMATION_DURATION);
         animator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
@@ -162,13 +176,12 @@ public class HelpSupportActivity extends AppCompatActivity {
         animator.start();
     }
 
-    // Hides all other questions before opening a new one
     private void collapseAllQuestions() {
-        collapseIfOpen(findViewById(R.id.question1_answer), findViewById(R.id.q1_arrow));
-        collapseIfOpen(findViewById(R.id.question2_answer), findViewById(R.id.q2_arrow));
-        collapseIfOpen(findViewById(R.id.question3_answer), findViewById(R.id.q3_arrow));
-        collapseIfOpen(findViewById(R.id.question4_answer), findViewById(R.id.q4_arrow));
-        collapseIfOpen(findViewById(R.id.question5_answer), findViewById(R.id.q5_arrow));
+        for (int answerId : questionAnswerMap.values()) {
+            TextView answer = findViewById(answerId);
+            ImageView arrow = findViewById(questionArrowMap.get(getKeyByValue(questionAnswerMap, answerId)));
+            collapseIfOpen(answer, arrow);
+        }
     }
 
     private void collapseIfOpen(TextView answer, ImageView arrow) {
@@ -178,4 +191,24 @@ public class HelpSupportActivity extends AppCompatActivity {
         }
     }
 
+    private void sendEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + EMAIL_ADDRESS));
+
+        try {
+            startActivity(Intent.createChooser(intent, "Send Email"));
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(HelpSupportActivity.this, "No email app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Helper method to get key from value in a Map
+    private static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null; // Or throw an exception if you prefer
+    }
 }

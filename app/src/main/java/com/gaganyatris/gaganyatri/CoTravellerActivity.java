@@ -1,16 +1,13 @@
 package com.gaganyatris.gaganyatri;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,26 +29,17 @@ public class CoTravellerActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private LoadingDialog loadingDialog;
     private static final String TAG = "CoTravellerActivity";
-    final int statusBarColor = R.color.newStatusBar;
+    private static final int STATUS_BAR_COLOR = R.color.newStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_co_traveller);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
-        findViewById(R.id.add_co_traveller).setOnClickListener(v -> startActivity(new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class)));
-        findViewById(R.id.backBtn).setOnClickListener(v -> finish());
-        coTravellerContainer = findViewById(R.id.coTravellerContainer);
-        db = FirebaseFirestore.getInstance();
-
-        setupLoadingDialog(); // Initialize the loading dialog
+        setupWindowInsets();
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, STATUS_BAR_COLOR));
+        initializeViews();
+        setupListeners();
         loadBaseUserDetails();
         loadCoTravellers();
     }
@@ -62,103 +50,83 @@ public class CoTravellerActivity extends AppCompatActivity {
         loadCoTravellers();
     }
 
-    private void setupLoadingDialog() {
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void initializeViews() {
+        coTravellerContainer = findViewById(R.id.coTravellerContainer);
+        db = FirebaseFirestore.getInstance();
         loadingDialog = new LoadingDialog(this);
         loadingDialog.setMessage("Please Wait...");
-        loadingDialog.show();
+    }
+
+    private void setupListeners() {
+        findViewById(R.id.add_co_traveller).setOnClickListener(v -> startActivity(new Intent(this, AddCoTravellerActivity.class)));
+        findViewById(R.id.backBtn).setOnClickListener(v -> finish());
     }
 
     private void loadCoTravellers() {
-        loadingDialog.show(); // Show loading dialog
-
+        loadingDialog.show();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         db.collection("coTravellers")
                 .whereEqualTo("user_uid", userUid)
                 .get()
                 .addOnCompleteListener(task -> {
-                    loadingDialog.dismiss(); // Dismiss dialog after fetching data
-
+                    loadingDialog.dismiss();
                     if (task.isSuccessful()) {
-                        coTravellerContainer.removeAllViews(); // Clear old data
-
-                        if (task.getResult().isEmpty()) {
-                            Toast.makeText(this, "No co-travellers found!", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
+                        coTravellerContainer.removeAllViews();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            CoTraveller coTraveller = document.toObject(CoTraveller.class);
-                            addCoTravellerView(coTraveller);
+                            addCoTravellerView(document.toObject(CoTraveller.class));
                         }
                     } else {
                         Log.e(TAG, "Error getting co-travellers", task.getException());
-                        Toast.makeText(this, "Failed to load co-travellers", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void addCoTravellerView(CoTraveller coTraveller) {
-        View coTravellerView = LayoutInflater.from(this).inflate(R.layout.co_traveller_card, coTravellerContainer, false);
-
-        TextView nameTextView = coTravellerView.findViewById(R.id.textView4);
-        TextView emailTextView = coTravellerView.findViewById(R.id.some_id);
-        CardView avatarCard = coTravellerView.findViewById(R.id.cardView);
-        ImageButton optionsButton = coTravellerView.findViewById(R.id.optionsLayout);
-
-        nameTextView.setText(coTraveller.getName());
-        emailTextView.setText(coTraveller.getEmail());
-
-        int avatarResource = getAvatarDrawable(coTraveller.getAvatarIndex());
-        if (avatarResource != 0) {
-            avatarCard.setForeground(ContextCompat.getDrawable(this, avatarResource));
-        }
-
-        // Set up popup menu for Edit/Delete
-        optionsButton.setOnClickListener(v -> showPopupMenu(v, coTraveller));
-
-        coTravellerContainer.addView(coTravellerView);
+        View view = LayoutInflater.from(this).inflate(R.layout.co_traveller_card, coTravellerContainer, false);
+        ((TextView) view.findViewById(R.id.textView4)).setText(coTraveller.getName());
+        ((TextView) view.findViewById(R.id.some_id)).setText(coTraveller.getEmail());
+        CardView avatarCard = view.findViewById(R.id.cardView);
+        avatarCard.setForeground(ContextCompat.getDrawable(this, getAvatarDrawable(coTraveller.getAvatarIndex())));
+        view.findViewById(R.id.optionsLayout).setOnClickListener(v -> showPopupMenu(v, coTraveller));
+        coTravellerContainer.addView(view);
     }
 
     private void showPopupMenu(View view, CoTraveller coTraveller) {
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.inflate(R.menu.co_traveller_menu); // Ensure this menu XML exists
-
-        popupMenu.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId(); // Extract item ID first
-
-            if (itemId == R.id.menu_edit) {
-                // editCoTraveller(coTraveller);
-                Intent intent = new Intent(CoTravellerActivity.this, AddCoTravellerActivity.class);
-                intent.putExtra("coTraveller_id", coTraveller.getCoTraveller_id()); // Pass coTraveller_id
+        PopupMenu popup = new PopupMenu(this, view);
+        popup.inflate(R.menu.co_traveller_menu);
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.menu_edit) {
+                Intent intent = new Intent(this, AddCoTravellerActivity.class);
+                intent.putExtra("coTraveller_id", coTraveller.getCoTraveller_id());
                 startActivity(intent);
                 return true;
-            } else if (itemId == R.id.menu_delete) {
+            } else if (item.getItemId() == R.id.menu_delete) {
                 deleteCoTraveller(coTraveller.getCoTraveller_id(), view);
                 loadCoTravellers();
                 return true;
-            } else {
-                return false;
             }
+            return false;
         });
-
-        popupMenu.show();
+        popup.show();
     }
 
-    private void deleteCoTraveller(String coTravellerId, View coTravellerView) {
-        db.collection("coTravellers").document(coTravellerId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    coTravellerContainer.removeView(coTravellerView);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show();
-                });
+    private void deleteCoTraveller(String id, View view) {
+        db.collection("coTravellers").document(id).delete()
+                .addOnSuccessListener(aVoid -> coTravellerContainer.removeView(view))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to delete co-traveller", e));
     }
 
-
-    private int getAvatarDrawable(int avatarIndex) {
-        switch (avatarIndex) {
+    private int getAvatarDrawable(int index) {
+        switch (index) {
             case 0: return R.drawable.ic_avatar_r1;
             case 1: return R.drawable.ic_avatar_r2;
             case 2: return R.drawable.ic_avatar_r3;
@@ -173,33 +141,15 @@ public class CoTravellerActivity extends AppCompatActivity {
     }
 
     private void loadBaseUserDetails() {
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        db.collection("users").document(userUid) // Assuming user data is stored in "users" collection
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String name = documentSnapshot.getString("name");
-                        String email = documentSnapshot.getString("email");
-                        int avatarIndex = documentSnapshot.getLong("avatarIndex").intValue(); // Ensure it is an integer
-
-                        // Update UI
-                        TextView nameTextView = findViewById(R.id.textView4);
-                        TextView emailTextView = findViewById(R.id.some_id);
-                        CardView avatarCard = findViewById(R.id.cardView);
-
-                        nameTextView.setText(name);
-                        emailTextView.setText(email);
-
-                        int avatarResource = getAvatarDrawable(avatarIndex);
-                        if (avatarResource != 0) {
-                            avatarCard.setForeground(ContextCompat.getDrawable(this, avatarResource));
-                        }
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        ((TextView) findViewById(R.id.textView4)).setText(doc.getString("name"));
+                        ((TextView) findViewById(R.id.some_id)).setText(doc.getString("email"));
+                        ((CardView) findViewById(R.id.cardView)).setForeground(ContextCompat.getDrawable(this, getAvatarDrawable(doc.getLong("avatarIndex").intValue())));
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load user details", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load user details", e));
     }
-
 }
