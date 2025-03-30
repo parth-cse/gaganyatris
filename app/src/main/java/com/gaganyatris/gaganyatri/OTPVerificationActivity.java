@@ -3,6 +3,9 @@ package com.gaganyatris.gaganyatri;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -33,73 +36,58 @@ import java.util.concurrent.TimeUnit;
 import com.gaganyatris.gaganyatri.utils.LoadingDialog;
 
 public class OTPVerificationActivity extends AppCompatActivity {
-    final int statusBarColor = R.color.primaryColor;
-    EditText otp1, otp2, otp3, otp4, otp5, otp6;
-    TextView resend;
-    Long timeOutSeconds = 60L;
-    String phoneNo;
 
-    String verificationCode;
-    PhoneAuthProvider.ForceResendingToken resendingToken;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private static final int STATUS_BAR_COLOR = R.color.primaryColor;
+    private static final long TIMEOUT_SECONDS = 60L;
+
+    private EditText[] otpFields;
+    private TextView resend;
+    private String phoneNo;
+    private String verificationCode;
+    private PhoneAuthProvider.ForceResendingToken resendingToken;
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_otpverification);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
+        setupWindowInsets();
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, STATUS_BAR_COLOR));
 
-        resend = findViewById(R.id.or);
-        otp1 = findViewById(R.id.otp1);
-        otp2 = findViewById(R.id.otp2);
-        otp3 = findViewById(R.id.otp3);
-        otp4 = findViewById(R.id.otp4);
-        otp5 = findViewById(R.id.otp5);
-        otp6 = findViewById(R.id.otp6);
-
+        initializeViews();
         setupOTPInputs();
 
         phoneNo = Objects.requireNonNull(getIntent().getExtras()).getString("phone");
         sendOtp(phoneNo, false);
 
-        ImageButton nextBtn = findViewById(R.id.next_btn);
-        nextBtn.setOnClickListener(view -> {
-            String enteredOTP = otp1.getText().toString() +
-                    otp2.getText().toString() +
-                    otp3.getText().toString() +
-                    otp4.getText().toString() +
-                    otp5.getText().toString() +
-                    otp6.getText().toString();
-
-            if (enteredOTP.length() != 6) {
-                Toast.makeText(OTPVerificationActivity.this, "Please enter all OTP digits", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            LoadingDialog loadingDialog = new LoadingDialog(this);
-            loadingDialog.setMessage("Verifying OTP...");
-            loadingDialog.show();
-
-            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationCode, enteredOTP);
-            signIn(credential, loadingDialog);
-        });
-
+        findViewById(R.id.next_btn).setOnClickListener(view -> verifyOTP());
         resend.setOnClickListener(view -> sendOtp(phoneNo, true));
     }
 
+    private void setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void initializeViews() {
+        resend = findViewById(R.id.or);
+        otpFields = new EditText[]{
+                findViewById(R.id.otp1), findViewById(R.id.otp2),
+                findViewById(R.id.otp3), findViewById(R.id.otp4),
+                findViewById(R.id.otp5), findViewById(R.id.otp6)
+        };
+        loadingDialog = new LoadingDialog(this);
+    }
+
     private void setupOTPInputs() {
-        EditText[] otpFields = {otp1, otp2, otp3, otp4, otp5, otp6};
-
         for (int i = 0; i < otpFields.length; i++) {
-            int index = i;
-
-            otpFields[index].addTextChangedListener(new android.text.TextWatcher() {
+            final int index = i;
+            otpFields[index].addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -111,52 +99,70 @@ public class OTPVerificationActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void afterTextChanged(android.text.Editable s) {}
+                public void afterTextChanged(Editable s) {}
             });
 
             otpFields[index].setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode == android.view.KeyEvent.KEYCODE_DEL && event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
-                    if (otpFields[index].getText().toString().isEmpty() && index > 0) {
-                        otpFields[index - 1].requestFocus();
-                    }
+                if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN
+                        && otpFields[index].getText().toString().isEmpty() && index > 0) {
+                    otpFields[index - 1].requestFocus();
                 }
                 return false;
             });
         }
     }
 
-    void sendOtp(String phone, boolean isResent) {
-        LoadingDialog loadingDialog = new LoadingDialog(this);
+    private void verifyOTP() {
+        StringBuilder otpBuilder = new StringBuilder();
+        for (EditText otpField : otpFields) {
+            otpBuilder.append(otpField.getText().toString());
+        }
+        String enteredOTP = otpBuilder.toString();
+
+        if (enteredOTP.length() != 6) {
+            Toast.makeText(this, "Please enter all OTP digits", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        loadingDialog.setMessage("Verifying OTP...");
+        loadingDialog.show();
+
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationCode, enteredOTP);
+        signIn(credential);
+    }
+
+    private void sendOtp(String phone, boolean isResent) {
         loadingDialog.setMessage("Sending OTP...");
         loadingDialog.show();
 
-        PhoneAuthOptions.Builder builder =
-                PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone).setTimeout(timeOutSeconds, TimeUnit.SECONDS)
-                        .setActivity(this).setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                            @Override
-                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                                loadingDialog.dismiss();
-                                signIn(phoneAuthCredential, loadingDialog);
-                            }
+        PhoneAuthOptions.Builder builder = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(phone)
+                .setTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .setActivity(this)
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        loadingDialog.dismiss();
+                        signIn(credential);
+                    }
 
-                            @Override
-                            public void onVerificationFailed(@NonNull FirebaseException e) {
-                                loadingDialog.dismiss();
-                                Toast.makeText(OTPVerificationActivity.this, "Login Process Failed", Toast.LENGTH_LONG).show();
-                                finish();
-                            }
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        loadingDialog.dismiss();
+                        Toast.makeText(OTPVerificationActivity.this, "Login Process Failed", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
 
-                            @Override
-                            public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                                super.onCodeSent(s, forceResendingToken);
-                                loadingDialog.dismiss();
-                                startResendTimer();
-                                verificationCode = s;
-                                resendingToken = forceResendingToken;
-                                Toast.makeText(OTPVerificationActivity.this, "OTP has been sent to" + phone, Toast.LENGTH_SHORT).show();
-                            }
+                    @Override
+                    public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                        loadingDialog.dismiss();
+                        startResendTimer();
+                        verificationCode = verificationId;
+                        resendingToken = token;
+                        Toast.makeText(OTPVerificationActivity.this, "OTP has been sent to " + phone, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                        });
         if (isResent) {
             PhoneAuthProvider.verifyPhoneNumber(builder.setForceResendingToken(resendingToken).build());
         } else {
@@ -164,17 +170,13 @@ public class OTPVerificationActivity extends AppCompatActivity {
         }
     }
 
-    void signIn(PhoneAuthCredential phoneAuthCredential, LoadingDialog loadingDialog) {
-        mAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+    private void signIn(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 loadingDialog.dismiss();
-
                 if (task.isSuccessful()) {
-                    Intent iHome = new Intent(OTPVerificationActivity.this, MainActivity.class);
-                    iHome.putExtra("phone", phoneNo);
-                    iHome.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(iHome);
+                    navigateToMainActivity();
                 } else {
                     Toast.makeText(OTPVerificationActivity.this, "OTP Verification Failed", Toast.LENGTH_SHORT).show();
                 }
@@ -183,23 +185,32 @@ public class OTPVerificationActivity extends AppCompatActivity {
         });
     }
 
-    void startResendTimer() {
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("phone", phoneNo);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private void startResendTimer() {
         resend.setTextColor(Color.parseColor("#66000000"));
         resend.setEnabled(false);
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        new Timer().schedule(new TimerTask() {
+            long remainingSeconds = TIMEOUT_SECONDS;
+
             @Override
             public void run() {
                 runOnUiThread(() -> {
-                    timeOutSeconds--;
-                    resend.setText("Resend OTP in " + timeOutSeconds);
-                    if (timeOutSeconds <= 0) {
-                        timeOutSeconds = 60L;
-                        timer.cancel();
-                        resend.setText("Resend OTP");
-                        resend.setTextColor(Color.parseColor("#4285F4"));
-                        resend.setEnabled(true);
+                    resend.setText("Resend OTP in " + remainingSeconds);
+                    if (remainingSeconds <= 0) {
+                        cancel();
+                        runOnUiThread(() -> {
+                            resend.setText("Resend OTP");
+                            resend.setTextColor(Color.parseColor("#4285F4"));
+                            resend.setEnabled(true);
+                        });
                     }
+                    remainingSeconds--;
                 });
             }
         }, 0, 1000);

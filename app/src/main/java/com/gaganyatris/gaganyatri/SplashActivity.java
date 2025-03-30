@@ -3,51 +3,38 @@ package com.gaganyatris.gaganyatri;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.splashscreen.SplashScreen;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
-    Handler handler = new Handler();
-    Runnable runnable;
+    private static final long SPLASH_DELAY = 4000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this); // Use SplashScreen API
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_splash);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        runnable = () -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            Intent intent;
+
             if (currentUser != null) {
-                // User is already signed in
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                intent = new Intent(SplashActivity.this, MainActivity.class);
             } else {
-                // User not signed in, go to onboarding
-                startActivity(new Intent(SplashActivity.this, OnBoardingActivity.class));
+                intent = new Intent(SplashActivity.this, OnBoardingActivity.class);
             }
+
+            startActivity(intent);
             finish();
-        };
-
-        // Run the check after a 4-second delay
-        handler.postDelayed(runnable, 4000);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacks(runnable);
+        }, SPLASH_DELAY);
     }
 }
