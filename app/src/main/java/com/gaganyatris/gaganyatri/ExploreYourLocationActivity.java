@@ -7,7 +7,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -34,6 +33,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.gaganyatris.gaganyatri.utils.LoadingDialog;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,12 +43,13 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
 
     private EditText fromEditText;
     private AutoCompleteTextView timeAutoCompleteTextView;
-    private AutoCompleteTextView tripTypeAutoCompleteTextView; // Added for trip type
+    private AutoCompleteTextView tripTypeAutoCompleteTextView;
     private MapView mapView;
     private GoogleMap googleMap;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient fusedLocationClient;
-    final int statusBarColor = R.color.newStatusBar;
+    private LoadingDialog loadingDialog;
+    private final int statusBarColor = R.color.newStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,35 +57,54 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_your_location);
 
+        setupWindowInsets();
+        setupUI();
+        setupMap(savedInstanceState);
+        setupLocation();
+        setupDropdowns();
+        setupSaveButton();
+    }
+
+    private void setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
+    }
+
+    private void setupUI() {
         ImageButton backBTN = findViewById(R.id.backBtn);
         backBTN.setOnClickListener(v -> finish());
-
-
         fromEditText = findViewById(R.id.from);
         timeAutoCompleteTextView = findViewById(R.id.time);
-        tripTypeAutoCompleteTextView = findViewById(R.id.type_of_trip); // Initialize
+        tripTypeAutoCompleteTextView = findViewById(R.id.type_of_trip);
+        fromEditText.setEnabled(false);
+    }
+
+    private void setupMap(Bundle savedInstanceState) {
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mapView.setVisibility(View.VISIBLE);
+    }
+
+    private void setupLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        loadingDialog = new LoadingDialog(this);
+        loadingDialog.setMessage("Please Wait...");
+        loadingDialog.show();
         getCurrentLocation();
+    }
 
-        fromEditText.setEnabled(false);
-
+    private void setupDropdowns() {
         populateTimeDropdown();
         populateTripTypeDropdown();
-        findViewById(R.id.btn_save_next).setOnClickListener(v -> {
-            sendDataToNextActivity();
-        });
+    }
+
+    private void setupSaveButton() {
+        findViewById(R.id.btn_save_next).setOnClickListener(v -> sendDataToNextActivity());
     }
 
     private void sendDataToNextActivity() {
@@ -102,20 +122,20 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
 
     private void populateTimeDropdown() {
         String[] timeOptions = {"1 hr", "1 hr 30 min", "2 hr", "2 hr 30 min", "3 hr", "3 hr 30 min", "4 hr", "4 hr 30 min", "5 hr", "5 hr 30 min", "6 hr", "6 hr 30 min", "7 hr", "7 hr 30 min", "8 hr", "8 hr 30 min", "9 hr", "9 hr 30 min"};
-        ArrayAdapter<String> timeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, timeOptions);
-        timeAutoCompleteTextView.setAdapter(timeAdapter);
-        timeAutoCompleteTextView.setThreshold(1);
-        timeAutoCompleteTextView.setOnClickListener(v -> timeAutoCompleteTextView.showDropDown());
-        timeAutoCompleteTextView.setKeyListener(null);
+        setupAutoCompleteTextView(timeAutoCompleteTextView, timeOptions);
     }
 
     private void populateTripTypeDropdown() {
         String[] tripTypeOptions = {"Religious", "Historic", "Educational", "Friends Trip", "Family Trip", "Solo Explorer"};
-        ArrayAdapter<String> tripTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, tripTypeOptions);
-        tripTypeAutoCompleteTextView.setAdapter(tripTypeAdapter);
-        tripTypeAutoCompleteTextView.setThreshold(1);
-        tripTypeAutoCompleteTextView.setOnClickListener(v -> tripTypeAutoCompleteTextView.showDropDown());
-        tripTypeAutoCompleteTextView.setKeyListener(null);
+        setupAutoCompleteTextView(tripTypeAutoCompleteTextView, tripTypeOptions);
+    }
+
+    private void setupAutoCompleteTextView(AutoCompleteTextView autoCompleteTextView, String[] options) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, options);
+        autoCompleteTextView.setAdapter(adapter);
+        autoCompleteTextView.setThreshold(1);
+        autoCompleteTextView.setOnClickListener(v -> autoCompleteTextView.showDropDown());
+        autoCompleteTextView.setKeyListener(null);
     }
 
     @Override
@@ -145,7 +165,6 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
-
         googleMap.setOnMapClickListener(latLng -> {
             googleMap.clear();
             googleMap.addMarker(new MarkerOptions().position(latLng));
@@ -157,20 +176,24 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<Location> locationResult = fusedLocationClient.getLastLocation();
             locationResult.addOnSuccessListener(this, location -> {
-                if (location != null) {
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(latLng)
-                            .zoom(15)
-                            .build();
-                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    getAddressFromLatLng(latLng); // Get address on initial location
-                } else {
-                    Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
+                handleLocationResult(location);
+                if (loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
                 }
             });
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    private void handleLocationResult(Location location) {
+        if (location != null) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            getAddressFromLatLng(latLng);
+        } else {
+            Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,6 +224,9 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
                 getCurrentLocation();
             } else {
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+                if (loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
+                }
             }
         }
     }
