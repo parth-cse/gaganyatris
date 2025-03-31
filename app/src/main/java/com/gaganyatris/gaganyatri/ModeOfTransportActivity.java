@@ -2,7 +2,6 @@ package com.gaganyatris.gaganyatri;
 
 import android.os.Bundle;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +28,10 @@ public class ModeOfTransportActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
         ImageButton backBTN = findViewById(R.id.backBtn);
         backBTN.setOnClickListener(v -> finish());
+
+        findViewById(R.id.english).setEnabled(false);
+        findViewById(R.id.hindi).setEnabled(false);
+        findViewById(R.id.marathi).setEnabled(false);
 
     }
 }
