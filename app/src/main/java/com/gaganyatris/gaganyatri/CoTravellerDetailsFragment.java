@@ -2,13 +2,7 @@ package com.gaganyatris.gaganyatri;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,39 +14,53 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.gaganyatris.gaganyatri.models.CoTraveller;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
 import java.util.Calendar;
 import java.util.Locale;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.UUID;
 
 public class CoTravellerDetailsFragment extends Fragment {
 
-    EditText name, email, pNo, dob, count, state, city;
-    Calendar calendar;
-    CountryCodePicker countryCode;
-    AutoCompleteTextView gender;
-    LinearLayout mobileNumberForm;
-
-
-
-
+    private EditText name, email, pNo, dob, count, state, city;
+    private Calendar calendar;
+    private CountryCodePicker countryCode;
+    private AutoCompleteTextView gender;
+    private LinearLayout mobileNumberForm;
+    private TextView headerTextView;
+    private Button btnSaveNext;
 
     public CoTravellerDetailsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_co_traveller_details, container, false);
+        initializeViews(view);
+        setupDatePicker();
+        return view;
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_co_traveller_details, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupGenderDropdown();
+        setupSaveNextButton();
+        populateFieldsIfEditing();
+    }
 
+    private void initializeViews(View view) {
         name = view.findViewById(R.id.first_name);
         email = view.findViewById(R.id.email);
         pNo = view.findViewById(R.id.phone_number);
@@ -65,170 +73,145 @@ public class CoTravellerDetailsFragment extends Fragment {
         city = view.findViewById(R.id.city);
         calendar = Calendar.getInstance();
         mobileNumberForm = view.findViewById(R.id.mobile_number_form);
-        dob.setOnClickListener(v -> showDatePickerDialog());
-
-        return view;
+        headerTextView = requireActivity().findViewById(R.id.textView2);
+        btnSaveNext = view.findViewById(R.id.btn_save_next);
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    private void setupDatePicker() {
+        dob.setOnClickListener(v -> showDatePickerDialog());
+    }
 
-        Button btnSaveNext = view.findViewById(R.id.btn_save_next);
-        TextView headerTextView = requireActivity().findViewById(R.id.textView2);
-
-        // Check if editing: get coTraveller_id if provided
-        String existingCoTravellerId;
-        if (getArguments() != null && getArguments().containsKey("coTraveller_id")) {
-            existingCoTravellerId = getArguments().getString("coTraveller_id");
-        } else {
-            existingCoTravellerId = null;
-        }
-
-        if (existingCoTravellerId != null) {
-            headerTextView.setText("Edit Co Traveller"); // Change title for edit mode
-
-            // Fetch co-traveller data from Firestore to prefill fields
-            FirebaseFirestore.getInstance().collection("coTravellers")
-                    .document(existingCoTravellerId)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            CoTraveller fetchedCoTraveller = documentSnapshot.toObject(CoTraveller.class);
-                            if (fetchedCoTraveller != null) {
-                                name.setText(fetchedCoTraveller.getName());
-                                email.setText(fetchedCoTraveller.getEmail());
-                                gender.setText(fetchedCoTraveller.getGender());
-                                count.setText(fetchedCoTraveller.getCountry());
-                                state.setText(fetchedCoTraveller.getState());
-                                city.setText(fetchedCoTraveller.getCity());
-
-                                if (fetchedCoTraveller.getPhoneNo() != null) {
-                                    String fullPhoneNumber = fetchedCoTraveller.getPhoneNo();
-                                    countryCode.setFullNumber(fullPhoneNumber);
-                                    String localPhoneNumber = countryCode.getFormattedFullNumber()
-                                            .replace("+" + countryCode.getSelectedCountryCode(), "");
-                                    pNo.setText(localPhoneNumber);
-                                }
-
-                                if (fetchedCoTraveller.getDateOfBirth() != null) {
-                                    Calendar dobCalendar = Calendar.getInstance();
-                                    dobCalendar.setTime(fetchedCoTraveller.getDateOfBirth().toDate());
-                                    String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%d",
-                                            dobCalendar.get(Calendar.DAY_OF_MONTH),
-                                            dobCalendar.get(Calendar.MONTH) + 1,
-                                            dobCalendar.get(Calendar.YEAR));
-                                    dob.setText(formattedDate);
-                                }
-                            }
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(requireContext(), "Failed to load co-traveller details", Toast.LENGTH_SHORT).show();
-                    });
-        }
-
-        // Allowed values for gender selection
+    private void setupGenderDropdown() {
         String[] genderOptions = {"Male", "Female", "Other"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_dropdown_item_1line, genderOptions);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderOptions);
         gender.setAdapter(adapter);
         gender.setThreshold(1);
         gender.setOnClickListener(v -> gender.showDropDown());
         gender.setKeyListener(null);
-
-        btnSaveNext.setOnClickListener(v -> {
-            // Fetch the current user UID
-            String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-            // Use existingCoTravellerId if editing, else generate a new unique ID
-            String coTravellerIdToUse = (existingCoTravellerId != null) ? existingCoTravellerId : UUID.randomUUID().toString();
-            boolean isEditing = (existingCoTravellerId != null);
-
-            // Collect data from form
-            String iName = name.getText().toString().trim();
-            String iEmail = email.getText().toString().trim();
-            String iPNo = countryCode.getFullNumberWithPlus().trim();
-            String iGender = gender.getText().toString().trim();
-            String iCountry = count.getText().toString().trim();
-            String iState = state.getText().toString().trim();
-            String iCity = city.getText().toString().trim();
-
-            // Validate required fields...
-            if (iName.isEmpty()) {
-                name.setError("Name is required");
-                name.requestFocus();
-                return;
-            }
-            if (iEmail.isEmpty()) {
-                email.setError("Email is required");
-                email.requestFocus();
-                return;
-            }
-            if (iPNo.isEmpty()) {
-                pNo.setError("Phone number is required");
-                pNo.requestFocus();
-                return;
-            }
-            if (iCountry.isEmpty()) {
-                count.setError("Country is required");
-                count.requestFocus();
-                return;
-            }
-            if (iState.isEmpty()) {
-                state.setError("State is required");
-                state.requestFocus();
-                return;
-            }
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(iEmail).matches()) {
-                email.setError("Enter a valid email");
-                email.requestFocus();
-                return;
-            }
-            if (iPNo.length() < 10 || iPNo.length() > 15) {
-                pNo.setError("Enter a valid phone number");
-                pNo.requestFocus();
-                return;
-            }
-
-            Timestamp iDob = null;
-            if (!dob.getText().toString().isEmpty()) {
-                String[] dateParts = dob.getText().toString().split("/");
-                if (dateParts.length == 3) {
-                    int day = Integer.parseInt(dateParts[0]);
-                    int month = Integer.parseInt(dateParts[1]) - 1;
-                    int year = Integer.parseInt(dateParts[2]);
-                    Calendar dobCalendar = Calendar.getInstance();
-                    dobCalendar.set(year, month, day);
-                    iDob = new Timestamp(dobCalendar.getTime());
-                }
-            }
-
-            // Create CoTraveller object using the determined ID
-            CoTraveller coTraveller = new CoTraveller(
-                    coTravellerIdToUse,  // Use existing id if editing, new id if adding
-                    currentUserUid,
-                    iName, iEmail, iPNo, iDob, iGender, iCountry, iState, iCity, 0
-            );
-
-            // Pass data to the next fragment
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("coTraveller", coTraveller);
-            bundle.putBoolean("isEditing", isEditing); // Pass the flag
-
-            CoTravellerAvatarFragment coTravellerAvatarFragment = new CoTravellerAvatarFragment();
-            coTravellerAvatarFragment.setArguments(bundle);
-
-            FragmentManager fm = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fm.beginTransaction();
-            transaction.replace(R.id.fragment_container, coTravellerAvatarFragment, "coTravellerAvatarFragment");
-            transaction.addToBackStack("coTravellerAvatarFragment");
-            transaction.commit();
-        });
     }
 
+    private void setupSaveNextButton() {
+        btnSaveNext.setOnClickListener(v -> saveAndNavigate());
+    }
 
+    private void populateFieldsIfEditing() {
+        String existingCoTravellerId = getArguments() != null && getArguments().containsKey("coTraveller_id")
+                ? getArguments().getString("coTraveller_id") : null;
 
+        if (existingCoTravellerId != null) {
+            headerTextView.setText("Edit Co Traveller");
+            fetchCoTravellerData(existingCoTravellerId);
+        }
+    }
+
+    private void fetchCoTravellerData(String coTravellerId) {
+        FirebaseFirestore.getInstance().collection("coTravellers").document(coTravellerId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        CoTraveller fetchedCoTraveller = documentSnapshot.toObject(CoTraveller.class);
+                        if (fetchedCoTraveller != null) {
+                            populateFields(fetchedCoTraveller);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to load co-traveller details", Toast.LENGTH_SHORT).show());
+    }
+
+    private void populateFields(CoTraveller coTraveller) {
+        name.setText(coTraveller.getName());
+        email.setText(coTraveller.getEmail());
+        gender.setText(coTraveller.getGender());
+        count.setText(coTraveller.getCountry());
+        state.setText(coTraveller.getState());
+        city.setText(coTraveller.getCity());
+
+        if (coTraveller.getPhoneNo() != null) {
+            countryCode.setFullNumber(coTraveller.getPhoneNo());
+            String localPhoneNumber = countryCode.getFormattedFullNumber().replace("+" + countryCode.getSelectedCountryCode(), "");
+            pNo.setText(localPhoneNumber);
+        }
+
+        if (coTraveller.getDateOfBirth() != null) {
+            Calendar dobCalendar = Calendar.getInstance();
+            dobCalendar.setTime(coTraveller.getDateOfBirth().toDate());
+            String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%d",
+                    dobCalendar.get(Calendar.DAY_OF_MONTH), dobCalendar.get(Calendar.MONTH) + 1, dobCalendar.get(Calendar.YEAR));
+            dob.setText(formattedDate);
+        }
+    }
+
+    private void saveAndNavigate() {
+        if (validateFields()) {
+            String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String existingCoTravellerId = getArguments() != null && getArguments().containsKey("coTraveller_id")
+                    ? getArguments().getString("coTraveller_id") : null;
+            String coTravellerIdToUse = existingCoTravellerId != null ? existingCoTravellerId : UUID.randomUUID().toString();
+            boolean isEditing = existingCoTravellerId != null;
+
+            CoTraveller coTraveller = createCoTravellerObject(coTravellerIdToUse, currentUserUid);
+            navigateToAvatarFragment(coTraveller, isEditing);
+        }
+    }
+
+    private boolean validateFields() {
+        if (name.getText().toString().trim().isEmpty()) {
+            name.setError("Name is required");
+            name.requestFocus();
+            return false;
+        }
+        if (email.getText().toString().trim().isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email.getText().toString().trim()).matches()) {
+            email.setError("Valid email is required");
+            email.requestFocus();
+            return false;
+        }
+        if (pNo.getText().toString().trim().isEmpty() || pNo.getText().toString().trim().length() < 10 || pNo.getText().toString().trim().length() > 15) {
+            pNo.setError("Valid phone number is required");
+            pNo.requestFocus();
+            return false;
+        }
+        if (count.getText().toString().trim().isEmpty()) {
+            count.setError("Country is required");
+            count.requestFocus();
+            return false;
+        }
+        if (state.getText().toString().trim().isEmpty()) {
+            state.setError("State is required");
+            state.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private CoTraveller createCoTravellerObject(String coTravellerId, String currentUserUid) {
+        Timestamp dobTimestamp = null;
+        if (!dob.getText().toString().isEmpty()) {
+            String[] dateParts = dob.getText().toString().split("/");
+            if (dateParts.length == 3) {
+                Calendar dobCalendar = Calendar.getInstance();
+                dobCalendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]) - 1, Integer.parseInt(dateParts[0]));
+                dobTimestamp = new Timestamp(dobCalendar.getTime());
+            }
+        }
+        return new CoTraveller(coTravellerId, currentUserUid, name.getText().toString().trim(),
+                email.getText().toString().trim(), countryCode.getFullNumberWithPlus().trim(), dobTimestamp,
+                gender.getText().toString().trim(), count.getText().toString().trim(),
+                state.getText().toString().trim(), city.getText().toString().trim(), 0);
+    }
+
+    private void navigateToAvatarFragment(CoTraveller coTraveller, boolean isEditing) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("coTraveller", coTraveller);
+        bundle.putBoolean("isEditing", isEditing);
+
+        CoTravellerAvatarFragment coTravellerAvatarFragment = new CoTravellerAvatarFragment();
+        coTravellerAvatarFragment.setArguments(bundle);
+
+        FragmentManager fm = requireActivity().getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.fragment_container, coTravellerAvatarFragment, "coTravellerAvatarFragment");
+        transaction.addToBackStack("coTravellerAvatarFragment");
+        transaction.commit();
+    }
 
     private void showDatePickerDialog() {
         int year = calendar.get(Calendar.YEAR);
@@ -237,12 +220,9 @@ public class CoTravellerDetailsFragment extends Fragment {
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Format the date as DD/MM/YYYY
-                    String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%d",
-                            selectedDay, selectedMonth + 1, selectedYear);
+                    String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear);
                     dob.setText(formattedDate);
                 }, year, month, day);
-
 
         datePickerDialog.show();
     }

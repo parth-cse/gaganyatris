@@ -2,7 +2,6 @@ package com.gaganyatris.gaganyatri;
 
 import android.os.Bundle;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,43 +15,50 @@ import androidx.fragment.app.FragmentTransaction;
 
 public class AddCoTravellerActivity extends AppCompatActivity {
 
-    final int statusBarColor = R.color.newStatusBar;
+    private static final int STATUS_BAR_COLOR = R.color.newStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_co_traveller);
+        setupWindowInsets();
+        setStatusBarColor();
+        setBackButtonListener();
+        loadInitialFragment(savedInstanceState);
+    }
+
+    private void setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
+    private void setStatusBarColor() {
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, STATUS_BAR_COLOR));
+    }
 
-        // Load PersonalDetailsFragment initially
+    private void setBackButtonListener() {
+        ImageButton backButton = findViewById(R.id.backBtn);
+        backButton.setOnClickListener(v -> finish());
+    }
 
-
-        ImageButton back = findViewById(R.id.backBtn);
-        back.setOnClickListener(v -> finish());
-
-        CoTravellerDetailsFragment fragment = new CoTravellerDetailsFragment();
-        String coTravellerId = getIntent().getStringExtra("coTraveller_id");
-        if(coTravellerId != null){
-//            TextView header = findViewById(R.id.textView2);
-//            header.setText("Edit Co Traveller");
-            Bundle bundle = new Bundle();
-            bundle.putString("coTraveller_id", coTravellerId);
-            fragment.setArguments(bundle);
-        }
-
+    private void loadInitialFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            loadFragment(fragment, false);
+            CoTravellerDetailsFragment detailsFragment = new CoTravellerDetailsFragment();
+            Bundle extras = getIntent().getExtras();
+            if (extras != null && extras.containsKey("coTraveller_id")) {
+                Bundle args = new Bundle();
+                args.putString("coTraveller_id", extras.getString("coTraveller_id"));
+                detailsFragment.setArguments(args);
+            }
+            loadFragment(detailsFragment, false);
         }
     }
 
-    public void loadFragment(Fragment fragment, boolean addToBackStack) {
+    private void loadFragment(Fragment fragment, boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
@@ -61,5 +67,4 @@ public class AddCoTravellerActivity extends AppCompatActivity {
         }
         transaction.commit();
     }
-
 }
