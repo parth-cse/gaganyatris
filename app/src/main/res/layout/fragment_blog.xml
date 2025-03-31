@@ -76,28 +76,33 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:id="@+id/imageView15"
+        <LinearLayout
+            android:id="@+id/noBlogs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/no_blog_found"
+            android:gravity="center"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/be_first_to_write_an_article_here"
-            android:textAppearance="@style/plan_you_fi"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView15"
-            app:layout_constraintVertical_bias="0.06999999" />
+            <ImageView
+                android:id="@+id/imageView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/no_blog_found" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/be_first_to_write_an_article_here"
+                android:textAppearance="@style/plan_you_fi" />
+        </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/blogContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
@@ -106,10 +111,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-            <include layout="@layout/blog_card" />
-
-            <include layout="@layout/blog_card" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/add_blog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="25dp"
+            android:background="@android:color/transparent"
+            android:elevation="1dp"
+            android:src="@drawable/plus_circle_fill"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
