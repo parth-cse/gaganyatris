@@ -37,15 +37,15 @@ public class GetGuideActivity extends AppCompatActivity {
         bgView = findViewById(R.id.bg); // Initialize the background view
 
         // Example: Show the optionsLayout when a trip is clicked
-        findViewById(R.id.trip1).setOnClickListener(v -> {
-            bgView.setVisibility(View.VISIBLE);
-            optionsLayout.setVisibility(View.VISIBLE);
-        });
-
-        findViewById(R.id.trip2).setOnClickListener(v -> {
-            bgView.setVisibility(View.VISIBLE);
-            optionsLayout.setVisibility(View.VISIBLE);
-        });
+//        findViewById(R.id.trip1).setOnClickListener(v -> {
+//            bgView.setVisibility(View.VISIBLE);
+//            optionsLayout.setVisibility(View.VISIBLE);
+//        });
+//
+//        findViewById(R.id.trip2).setOnClickListener(v -> {
+//            bgView.setVisibility(View.VISIBLE);
+//            optionsLayout.setVisibility(View.VISIBLE);
+//        });
 
         backBTN.setOnClickListener(v -> {
             if (optionsLayout.getVisibility() == View.VISIBLE) {
