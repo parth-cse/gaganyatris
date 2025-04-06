@@ -1,6 +1,6 @@
 package com.gaganyatris.gaganyatri;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -20,6 +21,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.gaganyatris.gaganyatri.utils.LoadingDialog;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,11 +53,13 @@ public class TripPlanActivity extends AppCompatActivity {
     String selectedMode, arrivalDate, returnDate, arrivalTime, returnTime;
     int numberOfTravellers;
     ArrayList<String> coTravellers;
-    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY; // Replace with your actual API key
+    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=" + GEMINI_API_KEY;
     TextView tripStartDateTextView, tripEndDateTextView, reachedDestinationTextView, tripDepartureTimeTextView;
     Spinner daySpinner;
     Map<String, JSONObject> dayItineraries = new HashMap<>();
+    String tripId;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,18 +73,14 @@ public class TripPlanActivity extends AppCompatActivity {
         });
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
-        findViewById(R.id.backBtn).setOnClickListener(v -> finish());
 
         tripStartDateTextView = findViewById(R.id.tripStartDate);
         tripEndDateTextView = findViewById(R.id.tripEndDate);
         reachedDestinationTextView = findViewById(R.id.reachedDestination);
         tripDepartureTimeTextView = findViewById(R.id.tripDepartureTime);
         itinaryContainer = findViewById(R.id.itinaryContainer);
-        daySpinner = findViewById(R.id.daySpinner); // Initialize daySpinner
+        daySpinner = findViewById(R.id.daySpinner);
 
-
-
-        // Retrieve Intent Extras
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             tripStartDate = bundle.getString("tripStartDate", "Not Set");
@@ -96,6 +98,7 @@ public class TripPlanActivity extends AppCompatActivity {
             returnTime = bundle.getString("returnTime", "Not Set");
             numberOfTravellers = bundle.getInt("numberOfTravellers", 1);
             coTravellers = bundle.getStringArrayList("coTraveller");
+            tripId = bundle.getString("tripID");
         }
 
         tripStartDateTextView.setText(formatDateTime(tripStartDate, arrivalTime));
@@ -103,8 +106,59 @@ public class TripPlanActivity extends AppCompatActivity {
         reachedDestinationTextView.setText(formatDateTime(arrivalDate, arrivalTime));
         tripDepartureTimeTextView.setText(formatDateTime(returnDate, returnTime));
 
+        if (tripId != null && !tripId.isEmpty()) {
+            fetchTripPlanFromFirebase(tripId);
+        } else {
+            fetchTripItinerary();
+        }
 
-        fetchTripItinerary();
+        findViewById(R.id.backBtn).setOnClickListener(v -> {
+            if (!dayItineraries.isEmpty()) {
+                if (tripId == null || tripId.isEmpty()) {
+                    showSaveConfirmationDialog();
+                } else {
+                    finish();
+                }
+            } else {
+                finish();
+            }
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!dayItineraries.isEmpty()) {
+                    if (tripId == null || tripId.isEmpty()) {
+                        showSaveConfirmationDialog();
+                    } else {
+                        finish();
+                    }
+                } else {
+                    finish();
+                }
+            }
+        });
+    }
+
+    private void fetchTripPlanFromFirebase(String tripId) {
+        LoadingDialog progressDialog = new LoadingDialog(this);
+        progressDialog.setMessage("Fetching trip plan...");
+        progressDialog.show();
+
+        db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
+            progressDialog.dismiss();
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists() && document.contains("tripPlan")) {
+                    String tripPlanJson = document.getString("tripPlan");
+                    handleFirebaseItineraryResponse(tripPlanJson);
+                } else {
+                    Toast.makeText(this, "Trip plan not found", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Failed to fetch trip plan", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private String formatDateTime(String date, String time) {
@@ -112,7 +166,7 @@ public class TripPlanActivity extends AppCompatActivity {
             return "Not Set";
         }
 
-        SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); // Changed input format here
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SimpleDateFormat inputTimeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, h:mm a", Locale.getDefault());
 
@@ -120,8 +174,7 @@ public class TripPlanActivity extends AppCompatActivity {
             Date dateObj = inputDateFormat.parse(date);
             Date timeObj = inputTimeFormat.parse(time);
 
-            // Combine date and time
-            SimpleDateFormat combinedFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());// changed combined format here.
+            SimpleDateFormat combinedFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
             Date combinedDate = combinedFormat.parse(date + " " + time);
 
             return outputFormat.format(combinedDate);
@@ -132,27 +185,25 @@ public class TripPlanActivity extends AppCompatActivity {
         }
     }
 
-
-    private void handleItineraryResponse(String jsonResponse) {
-        String jsonString = parseJsonResponse(jsonResponse); // Parse the response
-
-        if (jsonString == null) {
-            Toast.makeText(this, "Error parsing API response.", Toast.LENGTH_SHORT).show();
+    private void handleFirebaseItineraryResponse(String jsonResponse) {
+        if (jsonResponse == null || jsonResponse.isEmpty()) {
+            Toast.makeText(this, "Empty trip plan data.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
-            JSONObject itineraryJson = new JSONObject(jsonString);
+            JSONObject itineraryJson = new JSONObject(jsonResponse);
 
             dayItineraries.clear();
             List<String> dayLabels = new ArrayList<>();
 
-            for (int i = 1; i <= itineraryJson.length(); i++) {
-                String dayKey = "day " + i;
-                if (itineraryJson.has(dayKey)) {
-                    JSONObject day = itineraryJson.getJSONObject(dayKey);
+            Iterator<String> keys = itineraryJson.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject day = itineraryJson.getJSONObject(key);
+                if (day.has("date")) {
                     dayItineraries.put(day.getString("date"), day);
-                    dayLabels.add("Day " + i + " - " + day.getString("date"));
+                    dayLabels.add("Day " + (dayLabels.size() + 1) + " - " + day.getString("date"));
                 }
             }
 
@@ -183,17 +234,71 @@ public class TripPlanActivity extends AppCompatActivity {
         }
     }
 
-    // 2. Add parseJsonResponse method:
-    private String parseJsonResponse(String jsonResponse) {
+    private void handleGeminiItineraryResponse(String jsonResponse) {
+        if (jsonResponse == null || jsonResponse.isEmpty()) {
+            Toast.makeText(this, "Empty trip plan data.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         try {
-            JSONObject jsonObject = new JSONObject(jsonResponse);
+            String jsonString = extractJsonString(jsonResponse);
+
+            if (jsonString == null) {
+                Toast.makeText(this, "Error extracting JSON.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            JSONObject itineraryJson = new JSONObject(jsonString);
+
+            dayItineraries.clear();
+            List<String> dayLabels = new ArrayList<>();
+
+            Iterator<String> keys = itineraryJson.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject day = itineraryJson.getJSONObject(key);
+                if (day.has("date")) {
+                    dayItineraries.put(day.getString("date"), day);
+                    dayLabels.add("Day " + (dayLabels.size() + 1) + " - " + day.getString("date"));
+                }
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dayLabels);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            daySpinner.setAdapter(adapter);
+
+            daySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedDayLabel = (String) parent.getItemAtPosition(position);
+                    String selectedDate = selectedDayLabel.substring(selectedDayLabel.lastIndexOf("-") + 2).trim();
+                    displayItineraryForDate(selectedDate);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+
+            if (!dayLabels.isEmpty()) {
+                displayItineraryForDate(dayItineraries.keySet().iterator().next());
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error parsing itinerary", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String extractJsonString(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
             JSONArray candidates = jsonObject.getJSONArray("candidates");
             JSONObject firstCandidate = candidates.getJSONObject(0);
             JSONObject contentObject = firstCandidate.getJSONObject("content");
             JSONArray parts = contentObject.getJSONArray("parts");
             String textWithMarkdown = parts.getJSONObject(0).getString("text");
 
-            // Extract JSON from markdown
             String jsonString = textWithMarkdown;
             if (textWithMarkdown.startsWith("```json")) {
                 jsonString = textWithMarkdown.substring(7, textWithMarkdown.lastIndexOf("```")).trim();
@@ -207,7 +312,6 @@ public class TripPlanActivity extends AppCompatActivity {
         }
     }
 
-    // 4. Add displayItineraryForDate method:
     private void displayItineraryForDate(String date) {
         itinaryContainer.removeAllViews();
         if (dayItineraries.containsKey(date)) {
@@ -234,7 +338,7 @@ public class TripPlanActivity extends AppCompatActivity {
             }
         }
     }
-    // 2. Update fetchTripItinerary method:
+
     private void fetchTripItinerary() {
         LoadingDialog progressDialog = new LoadingDialog(this);
         progressDialog.setMessage("Fetching trip itinerary...");
@@ -248,7 +352,6 @@ public class TripPlanActivity extends AppCompatActivity {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setDoOutput(true);
 
-                // Construct the trip planning prompt
                 String prompt = "Plan a trip with the following details:\n\n" +
                         "1. Trip start date: " + tripStartDate + "\n" +
                         "2. Trip end date: " + tripEndDate + "\n" +
@@ -262,10 +365,9 @@ public class TripPlanActivity extends AppCompatActivity {
                         "10. Subtract Avg trip ticket cost from the budget and then plan the itinerary\n" +
                         "11. Travel Mode [mode of transport]: "+selectedMode+"\n\n"+
                         "Provide the itinerary in JSON format: " +
-                        "{\"day 1\":{\"date\":\"DD/MM/YYYY\", \"itinerary\":[{\"timeArrival\":\"HH:MM\", \"timeDeparture\":\"HH:MM\", \"loc\":\"Location\", \"activityName\":\"Activity Title (Eg. Check IN)\", \"mapView\":\"Location\"}]}, " +
-                        "\"day 2\":{\"date\":\"DD/MM/YYYY\", \"itinerary\":[{\"timeArrival\":\"HH:MM\", \"timeDeparture\":\"HH:MM\", \"loc\":\"Location\", \"activityName\":\"Activity Title (Eg. Check IN)\", \"mapView\":\"Location\"}]}}";
+                        "{\"01/01/2024\":{\"date\":\"01/01/2024\", \"itinerary\":[{\"timeArrival\":\"HH:MM\", \"timeDeparture\":\"HH:MM\", \"loc\":\"Location\", \"activityName\":\"Activity Title (Eg. Check IN)\", \"mapView\":\"Location\"}]}, " +
+                        "\"02/01/2024\":{\"date\":\"02/01/2024\", \"itinerary\":[{\"timeArrival\":\"HH:MM\", \"timeDeparture\":\"HH:MM\", \"loc\":\"Location\", \"activityName\":\"Activity Title (Eg. Check IN)\", \"mapView\":\"Location\"}]}}";
 
-                // Create JSON request body
                 JSONObject requestBody = new JSONObject();
                 JSONArray contentsArray = new JSONArray();
                 JSONObject contentsObject = new JSONObject();
@@ -278,13 +380,11 @@ public class TripPlanActivity extends AppCompatActivity {
                 contentsArray.put(contentsObject);
                 requestBody.put("contents", contentsArray);
 
-                // Send request
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(requestBody.toString().getBytes());
                     os.flush();
                 }
 
-                // Read response
                 int responseCode = conn.getResponseCode();
                 StringBuilder response = new StringBuilder();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -298,11 +398,10 @@ public class TripPlanActivity extends AppCompatActivity {
                     response.append("API Error: ").append(responseCode);
                 }
 
-                // Process response
                 String result = response.toString();
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    handleItineraryResponse(result); // Call the new method
+                    handleGeminiItineraryResponse(result);
                 });
 
             } catch (Exception e) {
@@ -313,5 +412,25 @@ public class TripPlanActivity extends AppCompatActivity {
                 });
             }
         }).start();
+    }
+
+    private void showSaveConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Save Trip Plan?")
+                .setMessage("Do you want to save the generated trip plan?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    JSONObject jsonTripPlan = new JSONObject(dayItineraries);
+                    String tripPlanJson = jsonTripPlan.toString();
+
+                    Intent intent = new Intent();
+                    intent.putExtra("tripPlanJson", tripPlanJson);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    setResult(RESULT_CANCELED);
+                    finish();
+                })
+                .show();
     }
 }

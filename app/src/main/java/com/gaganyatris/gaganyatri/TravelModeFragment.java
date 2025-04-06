@@ -1,13 +1,11 @@
 package com.gaganyatris.gaganyatri;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,11 +93,14 @@ public class TravelModeFragment extends Fragment {
         new FetchTravelTimesTask().execute();
 
         // Set click listeners for travel mode selection
-        flightOption.setOnClickListener(v -> selectTravelMode("Flight", flightOption));
+//        flightOption.setOnClickListener(v -> selectTravelMode("Flight", flightOption));
         trainOption.setOnClickListener(v -> selectTravelMode("Train", trainOption));
-        busOption.setOnClickListener(v -> selectTravelMode("Bus", busOption));
+//        busOption.setOnClickListener(v -> selectTravelMode("Bus", busOption));
         cabOption.setOnClickListener(v -> selectTravelMode("Cab", cabOption));
-
+        flightOption.setAlpha(0.5f);
+        busOption.setAlpha(0.5f);
+        flightOption.setEnabled(false);
+        busOption.setEnabled(false);
         // Handle Save Button Click
         btnSave.setOnClickListener(v -> {
             if (selectedMode.isEmpty()) {
@@ -124,6 +125,8 @@ public class TravelModeFragment extends Fragment {
 
                 i.putExtras(bundle);
                 startActivity(i);
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
+                fm.popBackStack();
             }
         });
 
@@ -310,6 +313,10 @@ public class TravelModeFragment extends Fragment {
             optionLayout.setEnabled(false);
             optionLayout.setAlpha(0.5f);
         }
+        flightOption.setAlpha(0.5f);
+        busOption.setAlpha(0.5f);
+        flightOption.setEnabled(false);
+        busOption.setEnabled(false);
     }
 
     private double parseTime(String timeString) {

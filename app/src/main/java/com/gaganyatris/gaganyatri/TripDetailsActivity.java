@@ -37,13 +37,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.gaganyatris.gaganyatri.models.CabDetails;
 import com.gaganyatris.gaganyatri.models.CoTraveller;
+import com.gaganyatris.gaganyatri.models.TrainDetails;
+import com.gaganyatris.gaganyatri.models.Trip;
 import com.gaganyatris.gaganyatri.models.Users;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,7 +56,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class TripDetailsActivity extends AppCompatActivity {
     private final int statusBarColor = R.color.primaryColor;
@@ -61,7 +64,7 @@ public class TripDetailsActivity extends AppCompatActivity {
     private String arrivalAtTripDest, returnTimeFromTripDest, arrivalDate, returnDate;
     private boolean exploreNearby, tripTicketEnteredTo = false, tripTicketEnteredFro = false;
     private int totalTripDays, prnStatus = 5;
-    private String avgTime;
+    private String avgTime, cabNumber,startTime, tripDate;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth;
@@ -70,6 +73,17 @@ public class TripDetailsActivity extends AppCompatActivity {
     private ImageView statusIcon;
     private ConstraintLayout ticketTo, ticketFro;
     ArrayList<String> coTravellers;
+    Trip trip = new Trip();
+
+
+    private String tripPlanJson; // Add this variable to store the JSON
+    TrainDetails trainDetailsTo, trainDetailsFro;
+    CabDetails cabDetailsTo, cabDetailsFro;
+
+    private String pnrNumber, trainNumber, trainName, travelClass, fromStation, toStation, departureTime, arrivalTime, source, destination, travelStartDate, travelDestDate, duration;
+
+    private String cabNumberDB, startTimeDB, tripDateDB, endTimeDB, endDateDB, sourceDB, destinationDB, durationDB;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +95,6 @@ public class TripDetailsActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         getWindow().setStatusBarColor(ContextCompat.getColor(this, statusBarColor));
 
         initViews();
@@ -89,15 +102,23 @@ public class TripDetailsActivity extends AppCompatActivity {
         fetchTripData();
     }
 
-    private void initViews() {
-        coTravellersTable = findViewById(R.id.coTravellersTable);
-        tripMode = findViewById(R.id.mode);
-        ticketStatus = findViewById(R.id.ticketStatus);
-        statusIcon = findViewById(R.id.statusIcon);
-        ticketTo = findViewById(R.id.ticketTo2);
-        ticketFro = findViewById(R.id.ticketFro2);
+    Timestamp stringDateToTimestamp(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return null; // Or handle the null/empty case as needed
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        try {
+            Date date = dateFormat.parse(dateString);
+            return new Timestamp(date);
+        } catch (ParseException e) {
+            // Handle parsing error (e.g., log the error, return null, throw exception)
+            System.err.println("Error parsing date: " + e.getMessage());
+            return null; // Or throw a RuntimeException if you want to fail fast
+        }
     }
 
+    // Modify setupNavigationButtons to start activity for result
     private void setupNavigationButtons() {
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
         findViewById(R.id.tripPlan).setOnClickListener(v -> {
@@ -107,7 +128,8 @@ public class TripDetailsActivity extends AppCompatActivity {
             bundle.putString("tripEndDate", endDate);
             bundle.putString("from", from);
             bundle.putString("to", to);
-            bundle.putString("budget", budget);
+            bundle.putString("budget",
+                    budget);
             bundle.putString("tripType", tripType);
             bundle.putBoolean("exploreNearby", exploreNearby);
             bundle.putInt("totalTripDays", totalTripDays);
@@ -115,16 +137,90 @@ public class TripDetailsActivity extends AppCompatActivity {
             bundle.putString("arrivalDate", arrivalDate);
             bundle.putString("returnDate", returnDate);
             bundle.putString("arrivalTime", arrivalAtTripDest);
+
             bundle.putString("returnTime", returnTimeFromTripDest);
-            bundle.putInt("numberOfTravellers", coTravellers.size()+1);
+            bundle.putInt("numberOfTravellers", coTravellers.size() + 1);
             bundle.putStringArrayList("coTraveller", coTravellers);
             // Add any other data you need to transfer
 
             intent.putExtras(bundle);
-            startActivity(intent);
+            startActivityForResult(intent, TRIP_PLAN_REQUEST_CODE); // Use a request code
         });
         findViewById(R.id.checkList).setOnClickListener(v -> startActivity(new Intent(this, TripCheckListActivity.class)));
         findViewById(R.id.mapView).setOnClickListener(v -> startActivity(new Intent(this, TripMapViewActivity.class)));
+    }
+
+    private static final int TRIP_PLAN_REQUEST_CODE = 100; // Define a request code
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TRIP_PLAN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                tripPlanJson = data.getStringExtra("tripPlanJson");
+                // Now you have the tripPlanJson, you can use it to save to Firestore
+                saveTripToFirestore();
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Trip plan save cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+/** ***/
+    private void saveTripToFirestore() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userUid = currentUser.getUid();
+        trip.setUserUid(userUid);
+        trip.setCoTravellers(coTravellers);
+        trip.setTripDetails(new HashMap<String, Object>() {{
+            put("startDate", startDate);
+            put("endDate", endDate);
+            put("from", from);
+            put("to", to);
+            put("budget", budget);
+            put("tripType", tripType);
+            put("exploreNearby", exploreNearby);
+            put("totalTripDays", totalTripDays);
+            put("travelMode", travelMode);
+            put("arrivalDate", arrivalDate);
+            put("returnDate", returnDate);
+            put("arrivalTime", arrivalAtTripDest);
+            put("returnTime", returnTimeFromTripDest);
+        }});
+        trip.setTripPlan(tripPlanJson);
+        trip.setTripStartDate(stringDateToTimestamp(startDate));
+
+        if ("Train".equals(travelMode)) {
+
+            trip.setTrainDetailsTo(trainDetailsTo);
+            trip.setTrainDetailsFro(trainDetailsFro);
+        } else if ("Cab".equals(travelMode)) {
+            trip.setCabDetailsTo(cabDetailsTo);
+            trip.setCabDetailsFro(cabDetailsFro);
+        }
+
+        db.collection("trips")
+                .add(trip)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(TripDetailsActivity.this, "Trip saved with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
+                    trip.setTripId(documentReference.getId());
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(TripDetailsActivity.this, "Error saving trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("Firestore Error", "Error saving trip", e);
+                });
+    }
+
+    private void initViews() {
+        coTravellersTable = findViewById(R.id.coTravellersTable);
+        tripMode = findViewById(R.id.mode);
+        ticketStatus = findViewById(R.id.ticketStatus);
+        statusIcon = findViewById(R.id.statusIcon);
+        ticketTo = findViewById(R.id.ticketTo2);
+        ticketFro = findViewById(R.id.ticketFro2);
     }
 
     private void fetchTripData() {
@@ -510,26 +606,45 @@ public class TripDetailsActivity extends AppCompatActivity {
             JSONObject data = jsonObject.getJSONObject("data");
 
             String trainNo = data.getString("TrainNo");
+            trainNumber = trainNo;
             String trainName = data.getString("TrainName");
+            this.trainName = trainName;
             String pnr = data.getString("Pnr");
+            pnrNumber = pnr;
             String travelDate = data.getString("Doj");
+            travelStartDate = travelDate;
             String destinationReached = data.getString("DestinationDoj");
+            travelDestDate = destinationReached;
             String fromStation = data.getString("BoardingPoint");
+            this.fromStation = fromStation;
             String toStation = data.getString("To");
+            this.toStation = toStation;
             String departureTime = data.getString("DepartureTime");
+            this.departureTime = departureTime;
             String arrivalTime = data.getString("ArrivalTime");
+            this.arrivalTime = arrivalTime;
             String travelClass = data.getString("Class");
+            this.travelClass = travelClass;
             String tripDuration = data.getString("Duration");
+            duration = tripDuration;
             String source = data.getString("SourceName");
+            this.source=source;
             String dest = data.getString("DestinationName");
+            destination = dest;
 
             if(id == findViewById(R.id.ticketTo2)){
                 arrivalAtTripDest = arrivalTime;
                 arrivalDate = destinationReached;
+                trainDetailsTo = new TrainDetails(
+                        pnrNumber, trainNumber, trainName, travelClass, fromStation, toStation, departureTime, arrivalTime, source, destination, travelStartDate, travelDestDate, duration
+                );
             }else{
                 if(id == findViewById(R.id.ticketFro2)){
                     returnTimeFromTripDest = departureTime;
                     returnDate = travelDate;
+                    trainDetailsFro = new TrainDetails(
+                            pnrNumber, trainNumber, trainName, travelClass, fromStation, toStation, departureTime, arrivalTime, source, destination, travelStartDate, travelDestDate, duration
+                    );
                 }
             }
 
@@ -655,9 +770,9 @@ public class TripDetailsActivity extends AppCompatActivity {
         builder.setView(layout);
 
         builder.setPositiveButton("Submit", (dialog, which) -> {
-            String cabNumber = cabNumberInput.getText().toString().trim();
-            String startTime = startTimeText.getText().toString().trim();
-            String tripDate = (id == findViewById(R.id.ticketFro2)) ? tripDateText.getText().toString().trim() : startDate;
+            cabNumber = cabNumberInput.getText().toString().trim();
+            startTime = startTimeText.getText().toString().trim();
+            tripDate = (id == findViewById(R.id.ticketFro2)) ? tripDateText.getText().toString().trim() : startDate;
 
             if (cabNumber.isEmpty() || startTime.isEmpty() || (id == findViewById(R.id.ticketFro2) && tripDate.isEmpty())) {
                 Toast.makeText(this, "Please fill all the details", Toast.LENGTH_SHORT).show();
@@ -676,7 +791,8 @@ public class TripDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "Average travel time is missing", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        startTimeDB = startTime;
+        tripDateDB = tripDate;
         LayoutInflater inflater = LayoutInflater.from(this);
         View cabView = inflater.inflate(R.layout.travel_cab_layout, id, false);
 
@@ -690,10 +806,13 @@ public class TripDetailsActivity extends AppCompatActivity {
         TextView dur = cabView.findViewById(R.id.duration);
 
         cabNumberView.setText("Vehicle No.: " + cabNumber);
+        cabNumberDB = cabNumber;
         tripDateView.setText(formatDateCab(tripDate)); // Use selected trip date
         tripStartTime.setText(startTime);
         source.setText(from);
+        sourceDB = from;
         dest.setText(to);
+        destinationDB = to;
 
 
         if (id == findViewById(R.id.ticketFro2)) {
@@ -739,7 +858,7 @@ public class TripDetailsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        tripStartCal.set(Calendar.HOUR_OF_DAY, startHour);
+        tripStartCal.set( Calendar.HOUR_OF_DAY, startHour);
         tripStartCal.set(Calendar.MINUTE, startMinute);
 
         // Store original date before modification
@@ -760,7 +879,9 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         // Set values in UI
         tripEndTime.setText(endTime);
+        endTimeDB = endTime;
         tripEndDate.setText(formatDateCab(endDate));
+        endDateDB = formatDate(endDate);
 
         // Calculate duration in hours and minutes
         int durationHours = avgHours;
@@ -777,19 +898,29 @@ public class TripDetailsActivity extends AppCompatActivity {
         // Set duration in TextView dur
          if (durationMinutes > 0) {
                 dur.setText(String.format(Locale.getDefault(), "%d hr %02d mins", durationHours, durationMinutes));
+                durationDB = String.format(Locale.getDefault(), "%d hr %02d mins", durationHours, durationMinutes);
             } else {
                 dur.setText(String.format(Locale.getDefault(), "%d hr", durationHours));
+                durationDB = String.format(Locale.getDefault(), "%d hr", durationHours);
             }
 
         if (id == findViewById(R.id.ticketTo2)) {
             arrivalAtTripDest = endTime;
             arrivalDate = endDate;
+            cabDetailsTo= new CabDetails(
+                    cabNumberDB, startTimeDB, tripDateDB, endTimeDB, endDateDB, sourceDB, destinationDB, durationDB
+            );
         } else {
             if (id == findViewById(R.id.ticketFro2)) {
                 returnTimeFromTripDest = startTime;
                 returnDate = tripDate;
                 source.setText(to);
+                destinationDB = from;
+                sourceDB = to;
                 dest.setText(from);
+                cabDetailsFro= new CabDetails(
+                        cabNumberDB, startTimeDB, tripDateDB, endTimeDB, endDateDB, sourceDB, destinationDB, durationDB
+                );
             }
         }
 
@@ -843,6 +974,4 @@ public class TripDetailsActivity extends AppCompatActivity {
 
         datePickerDialog.show();
     }
-
-
 }

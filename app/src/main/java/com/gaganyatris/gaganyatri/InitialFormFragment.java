@@ -26,15 +26,12 @@ import android.widget.Toast;
 
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -150,7 +147,7 @@ public class InitialFormFragment extends Fragment {
         });
 
 
-        String[] tripTypeOptions = {"Religious", "Historic", "Educational", "Friends Trip", "Family Trip", "Solo Explorer"};
+        String[] tripTypeOptions = {"Religious", "Historic", "Educational", "Friends Trip", "Family Trip", "Explorer"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, tripTypeOptions);
         tripType.setAdapter(adapter);

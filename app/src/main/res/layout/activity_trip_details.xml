@@ -501,7 +501,7 @@
                     android:id="@+id/cardView"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:foreground="@drawable/jeta"
+                    android:foreground="@drawable/avatar_male"
                     app:cardCornerRadius="999dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -510,37 +510,18 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_marginStart="20dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/cardView"
+                    android:orientation="vertical"
+
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/cardView"
-                    app:layout_constraintTop_toTopOf="@+id/cardView">
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Jethalal Gada"
+                        android:text="Guide Support is currently\nNot available"
                         android:textAppearance="@style/travel_tick" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Age: 32"
-                        android:textAppearance="@style/train_fligh" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Contat: +91 8999533091"
-                        android:textAppearance="@style/train_fligh" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vertified"
-                        android:textAppearance="@style/verified"
-                        android:textStyle="bold"/>
-
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

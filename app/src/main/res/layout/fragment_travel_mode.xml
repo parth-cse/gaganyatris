@@ -37,6 +37,7 @@
             app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
         <ScrollView
+            android:id="@+id/scrollView3"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="44dp"
@@ -55,9 +56,9 @@
                     android:id="@+id/op_flight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/card_settings"
                     android:paddingHorizontal="22dp"
-                    android:paddingVertical="15dp"
-                    android:background="@drawable/card_settings">
+                    android:paddingVertical="15dp">
 
                     <TextView
                         android:id="@+id/textView5"
@@ -87,10 +88,10 @@
                     android:id="@+id/op_train"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="22dp"
                     android:layout_marginTop="15dp"
-                    android:paddingVertical="15dp"
-                    android:background="@drawable/card_settings">
+                    android:background="@drawable/card_settings"
+                    android:paddingHorizontal="22dp"
+                    android:paddingVertical="15dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -118,10 +119,10 @@
                     android:id="@+id/op_bus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="22dp"
                     android:layout_marginTop="15dp"
-                    android:paddingVertical="15dp"
-                    android:background="@drawable/card_settings">
+                    android:background="@drawable/card_settings"
+                    android:paddingHorizontal="22dp"
+                    android:paddingVertical="15dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -149,10 +150,10 @@
                     android:id="@+id/op_others"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="22dp"
-                    android:paddingVertical="15dp"
                     android:layout_marginTop="15dp"
-                    android:background="@drawable/card_settings">
+                    android:background="@drawable/card_settings"
+                    android:paddingHorizontal="22dp"
+                    android:paddingVertical="15dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -181,6 +182,43 @@
             </LinearLayout>
 
         </ScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/warning_card"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="@+id/scrollView3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="22dp"
+                android:paddingVertical="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Flight and Bus options are currently not supported"
+                    android:textColor="#664d03"
+                    android:textSize="12dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <LinearLayout
             android:id="@+id/btns"

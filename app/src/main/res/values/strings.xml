@@ -12,7 +12,7 @@
     <string name="hey_parth">Hey!👋 Traveller</string>
     <string name="hope_you_ar">Hope you are having a great day</string>
     <string name="home">Home</string>
-    <string name="history">History</string>
+    <string name="history">My Trips</string>
     <string name="blog">Blog</string>
     <string name="settings">Settings</string>
     <string name="profile">Profile</string>
@@ -29,7 +29,7 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_amp_conditions"><![CDATA[Terms & Conditions]]></string>
     <string name="logout">Logout</string>
-    <string name="my_travel_history">My Travel History</string>
+    <string name="my_travel_history">My Trips</string>
     <string name="search_by_city_or_date">Search by City or Date</string>
     <string name="plan_you_first_journey_with_us">Plan you first journey with us.</string>
     <string name="trip_to_hyderabad">Trip to Hyderabad</string>

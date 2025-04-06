@@ -126,7 +126,7 @@ public class ExploreYourLocationActivity extends AppCompatActivity implements On
     }
 
     private void populateTripTypeDropdown() {
-        String[] tripTypeOptions = {"Religious", "Historic", "Educational", "Friends Trip", "Family Trip", "Solo Explorer"};
+        String[] tripTypeOptions = {"Religious", "Historic", "Educational", "Friends Trip", "Family Trip", "Explorer", "Lunch or Dinner", "Food Explore"};
         setupAutoCompleteTextView(tripTypeAutoCompleteTextView, tripTypeOptions);
     }
 
