@@ -18,7 +18,7 @@ GaganYatri is a comprehensive travel application designed to simplify and enhanc
 
 ## MVP Link
 
-[GaganYatri MVP](https://drive.google.com/file/d/1o9P-G1OKp3vM7kHWCHL5JVcqFMjGOwOB/view?usp=sharing)
+[GaganYatri MVP](https://github.com/parth-cse/gaganyatris)
 
 ## Test Credentials
 
@@ -51,7 +51,7 @@ GaganYatri is a comprehensive travel application designed to simplify and enhanc
 ## UN SDGs Covered
 
 <p align="center">
-  <img src="SDgs/s-blob-v1-IMAGE-4-Cq893Cq-o.png" alt="Splash Screen" width="800">
+  <img src="SDGs/s-blob-v1-IMAGE-4-Cq893Cq-o.png" alt="Splash Screen" width="800">
 </p>
 
 ## License
