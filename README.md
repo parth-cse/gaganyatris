@@ -18,7 +18,7 @@ GaganYatri is a comprehensive travel application designed to simplify and enhanc
 
 ## MVP Link
 
-[GaganYatri MVP](https://drive.google.com/drive/folders/1e2JFu-zIgBnLfuawD-Z9N64WqdtAt6YO?usp=sharing)
+[GaganYatri MVP](https://drive.google.com/file/d/1o9P-G1OKp3vM7kHWCHL5JVcqFMjGOwOB/view?usp=sharing)
 
 ## Test Credentials
 
